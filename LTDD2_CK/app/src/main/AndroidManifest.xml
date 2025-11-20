@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.ltdd2_ck">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.LTDD2_CK">
+
+        <activity android:name=".InfoActivity" />
+        <activity android:name=".FavoriteActivity" />
+        <activity android:name=".ReadHistoryActivity" />
+        <activity android:name=".BorrowHistoryActivity" />
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".HelpActivity" />
+        <activity android:name=".AboutActivity" />
+        <activity android:name=".EditProfileActivity" />
+        <activity android:name=".NotificationSettingsActivity"/>
+        <activity android:name=".RatedBooksActivity"/>
+
+        <activity
+            android:name=".AccountActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>

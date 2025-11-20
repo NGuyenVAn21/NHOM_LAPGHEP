@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BookHub">
         <activity
-            android:name=".MainActivity"
+            android:name=".HomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,6 +20,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".EventsActivity"
+            android:exported="false"
+            android:label="Sự kiện"
+            android:parentActivityName=".HomeActivity"/>
+
+        <activity
+            android:name=".EventDetailActivity"
+            android:exported="false"
+            android:label="Chi tiết Sự kiện"
+            android:parentActivityName=".EventsActivity"/>
     </application>
 
 </manifest>

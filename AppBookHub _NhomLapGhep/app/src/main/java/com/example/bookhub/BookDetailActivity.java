@@ -10,7 +10,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.example.tong_nhomdtdd.Book;
+import com.example.bookhub.Book;
 
 public class BookDetailActivity extends AppCompatActivity {
 

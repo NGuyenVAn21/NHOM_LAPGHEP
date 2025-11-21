@@ -11,8 +11,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Chuyển thẳng đến màn hình đọc sách
-        Intent intent = new Intent(this, ReadingActivity.class);
+        // Chuyển đến màn hình Home thay vì ReadingActivity
+        Intent intent = new Intent(this, HomeActivity.class);
         startActivity(intent);
         finish();
     }

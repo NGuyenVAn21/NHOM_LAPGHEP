@@ -9,8 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.tong_nhomdtdd.Book;
-import com.example.tong_nhomdtdd.R;
+import com.example.bookhub.Book;
+import com.example.bookhub.R;
 
 import java.util.List;
 

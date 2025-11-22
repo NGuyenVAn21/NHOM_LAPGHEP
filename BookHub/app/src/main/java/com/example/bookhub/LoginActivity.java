@@ -3,27 +3,19 @@ package com.example.bookhub;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.EditText; // Đã đổi từ TextInputEditText sang EditText
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.example.bookhub.api.RetrofitClient;
-import com.example.bookhub.models.LoginRequest;
-import com.example.bookhub.models.LoginResponse;
 import com.google.android.material.button.MaterialButton;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
-    // SỬA Ở ĐÂY: Dùng EditText thay vì TextInputEditText
     private EditText etUsername, etPassword;
     private MaterialButton btnLogin;
     private TextView tvRegister, tvForgotPassword;
@@ -37,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
 
         sharedPreferences = getSharedPreferences("BookHubPrefs", MODE_PRIVATE);
 
+        // Kiểm tra nếu đã đăng nhập trước đó thì vào thẳng Main
         if (isLoggedIn()) {
             navigateToHome();
             return;
@@ -47,7 +40,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        // Ánh xạ đúng ID trong XML
         etUsername = findViewById(R.id.etUsername);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
@@ -87,35 +79,20 @@ public class LoginActivity extends AppCompatActivity {
 
         showLoading(true);
 
-        LoginRequest loginRequest = new LoginRequest(username, password);
+        // GIẢ LẬP LOGIN (MOCK)
+        // Tạo độ trễ 1 xíu (1s) để nhìn giống đang xử lý, sau đó kiểm tra
+        new Handler().postDelayed(() -> {
+            showLoading(false);
 
-        Call<LoginResponse> call = RetrofitClient.getApiService().login(loginRequest);
-        call.enqueue(new Callback<LoginResponse>() {
-            @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                showLoading(false);
-                if (response.isSuccessful() && response.body() != null) {
-                    LoginResponse loginResponse = response.body();
-                    // Vì API C# trả về JSON có thể khác cấu trúc một chút, cần kiểm tra kỹ
-                    // Giả sử C# trả về token thì coi như thành công
-                    if (loginResponse.getToken() != null) {
-                        saveLoginInfo(loginResponse);
-                        Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                        navigateToHome();
-                    } else {
-                        Toast.makeText(LoginActivity.this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(LoginActivity.this, "Sai tài khoản hoặc mật khẩu", Toast.LENGTH_SHORT).show();
-                }
+            // Kịch bản: admin / 123456
+            if (username.equals("admin") && password.equals("123456")) {
+                saveMockLoginInfo(); // Lưu thông tin giả vào máy
+                Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                navigateToHome();
+            } else {
+                Toast.makeText(LoginActivity.this, "Sai tài khoản hoặc mật khẩu (admin/123456)", Toast.LENGTH_SHORT).show();
             }
-
-            @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
-                showLoading(false);
-                Toast.makeText(LoginActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+        }, 1000);
     }
 
     private void showLoading(boolean isLoading) {
@@ -128,17 +105,18 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void saveLoginInfo(LoginResponse response) {
+    // Lưu thông tin giả để app nhớ trạng thái đăng nhập
+    private void saveMockLoginInfo() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("isLoggedIn", true);
-        editor.putString("token", response.getToken());
+        editor.putString("token", "mock-token-123456");
 
-        if (response.getUser() != null) {
-            editor.putInt("userId", response.getUser().getId());
-            editor.putString("username", response.getUser().getUsername());
-            editor.putString("fullName", response.getUser().getFullName());
-            editor.putString("email", response.getUser().getEmail());
-        }
+        // Lưu thông tin giả của Admin
+        editor.putInt("userId", 1);
+        editor.putString("username", "admin");
+        editor.putString("fullName", "Administrator");
+        editor.putString("email", "admin@bookhub.com");
+
         editor.apply();
     }
 

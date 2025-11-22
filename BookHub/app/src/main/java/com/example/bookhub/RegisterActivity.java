@@ -1,29 +1,19 @@
 package com.example.bookhub;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Patterns;
 import android.view.View;
-import android.widget.EditText; // Đổi sang EditText
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.example.bookhub.api.RetrofitClient;
-import com.example.bookhub.models.RegisterRequest;
-import com.example.bookhub.models.RegisterResponse;
 import com.google.android.material.button.MaterialButton;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    // SỬA Ở ĐÂY: Dùng EditText
     private EditText etFullName, etEmail, etUsername, etPassword, etConfirmPassword;
     private MaterialButton btnRegister;
     private TextView tvLogin;
@@ -62,6 +52,7 @@ public class RegisterActivity extends AppCompatActivity {
         String password = etPassword.getText().toString().trim();
         String confirmPassword = etConfirmPassword.getText().toString().trim();
 
+        // 1. Kiểm tra dữ liệu đầu vào (Validation)
         if (TextUtils.isEmpty(fullName)) {
             etFullName.setError("Vui lòng nhập họ tên");
             return;
@@ -85,28 +76,17 @@ public class RegisterActivity extends AppCompatActivity {
 
         showLoading(true);
 
-        RegisterRequest registerRequest = new RegisterRequest(fullName, email, username, password);
+        // 2. GIẢ LẬP ĐĂNG KÝ THÀNH CÔNG
+        // Không gọi API, chỉ delay 1 chút rồi báo thành công
+        new Handler().postDelayed(() -> {
+            showLoading(false);
 
-        Call<RegisterResponse> call = RetrofitClient.getApiService().register(registerRequest);
-        call.enqueue(new Callback<RegisterResponse>() {
-            @Override
-            public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
-                showLoading(false);
-                // Kiểm tra status code 200 (OK)
-                if (response.isSuccessful()) {
-                    Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_LONG).show();
-                    finish(); // Quay về login
-                } else {
-                    Toast.makeText(RegisterActivity.this, "Đăng ký thất bại (Tài khoản đã tồn tại?)", Toast.LENGTH_SHORT).show();
-                }
-            }
+            // Luôn báo thành công khi thông tin hợp lệ
+            Toast.makeText(RegisterActivity.this, "Đăng ký thành công! Vui lòng đăng nhập.", Toast.LENGTH_LONG).show();
 
-            @Override
-            public void onFailure(Call<RegisterResponse> call, Throwable t) {
-                showLoading(false);
-                Toast.makeText(RegisterActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+            // Đóng màn hình đăng ký để quay về Login
+            finish();
+        }, 1000);
     }
 
     private void showLoading(boolean isLoading) {

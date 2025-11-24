@@ -145,23 +145,28 @@ public class BookSearchActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
+        bottomNavigationView.setSelectedItemId(R.id.navigation_books);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
                 int itemId = item.getItemId();
                 if (itemId == R.id.navigation_home) {
-                    // Đã ở trang chủ
+                    Intent intent = new Intent(BookSearchActivity.this, HomeActivity.class);
+                    startActivity(intent);
+                    overridePendingTransition(0, 0);
                     return true;
                 } else if (itemId == R.id.navigation_books) {
                     // Đã ở trang sách
                     return true;
                 } else if (itemId == R.id.navigation_borrow) {
-                    // Xử lý chuyển đến trang mượn sách
-                    showToast("Chuyển đến trang mượn sách");
+                    Intent intent = new Intent(BookSearchActivity.this, BorrowHistoryActivity.class);
+                    startActivity(intent);
+                    overridePendingTransition(0, 0);
                     return true;
                 } else if (itemId == R.id.navigation_account) {
-                    // Xử lý chuyển đến trang tài khoản
-                    showToast("Chuyển đến trang tài khoản");
+                    Intent intent = new Intent(BookSearchActivity.this, AccountActivity.class);
+                    startActivity(intent);
+                    overridePendingTransition(0, 0);
                     return true;
                 }
                 return false;

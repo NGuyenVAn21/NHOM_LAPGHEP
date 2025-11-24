@@ -22,7 +22,7 @@
                 android:layout_height="100dp"
                 android:src="@drawable/ic_book"
                 android:layout_centerInParent="true"
-                android:tint="@color/white" />
+                app:tint="@color/white" />
 
             <!-- Back Button -->
             <ImageButton
@@ -32,7 +32,7 @@
                 android:layout_margin="16dp"
                 android:background="@drawable/bg_rounded_white"
                 android:src="@drawable/ic_arrow_back"
-                android:tint="@color/black" />
+                app:tint="@color/black" />
 
             <!-- Favorite Button -->
             <ImageButton
@@ -43,7 +43,7 @@
                 android:layout_margin="16dp"
                 android:background="@drawable/bg_rounded_white"
                 android:src="@drawable/ic_favorite_border"
-                android:tint="@color/black" />
+                app:tint="@color/black" />
 
         </RelativeLayout>
 

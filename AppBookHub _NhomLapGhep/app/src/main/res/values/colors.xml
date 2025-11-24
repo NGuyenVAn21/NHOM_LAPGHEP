@@ -12,6 +12,8 @@
 
     <!-- Accent Color -->
     <color name="accent_color">#36D1DC</color>
+    <color name="accent_start">#36D1DC</color>
+    <color name="accent_end">#5B86E5</color>
 
     <!-- Màu cơ bản -->
     <color name="white">#FFFFFF</color>
@@ -34,4 +36,6 @@
     <color name="teal_200">#36D1DC</color>
     <color name="teal_700">#2AA8B3</color>
 
+    <color name="black_app">#1E1E2D</color>
+    <color name="grey_text">#8A8AA3</color>
 </resources>

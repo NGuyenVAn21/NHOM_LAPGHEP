@@ -24,7 +24,7 @@
                 android:layout_height="48dp"
                 android:src="@drawable/ic_book"
                 android:layout_centerInParent="true"
-                android:tint="@color/white" />
+                app:tint="@color/white" />
 
             <!-- Status Badge -->
             <LinearLayout

@@ -1,0 +1,69 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\NGANH_HO_CNTT\\ThucHanhLTWNC\\BookHubAPI\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{14CBA810-6B5F-47E3-836E-21BA59C63CA7}|BookHubAPI\\BookHubAPI.csproj|d:\\nganh_ho_cntt\\thuchanhltwnc\\bookhubapi\\bookhubapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14CBA810-6B5F-47E3-836E-21BA59C63CA7}|BookHubAPI\\BookHubAPI.csproj|solutionrelative:bookhubapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{14CBA810-6B5F-47E3-836E-21BA59C63CA7}|BookHubAPI\\BookHubAPI.csproj|d:\\nganh_ho_cntt\\thuchanhltwnc\\bookhubapi\\bookhubapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14CBA810-6B5F-47E3-836E-21BA59C63CA7}|BookHubAPI\\BookHubAPI.csproj|solutionrelative:bookhubapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 788,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{74946827-37a0-11d2-a273-00c04f8ef4ff}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\NGANH_HO_CNTT\\ThucHanhLTWNC\\BookHubAPI\\BookHubAPI\\Program.cs",
+              "RelativeDocumentMoniker": "BookHubAPI\\Program.cs",
+              "ToolTip": "D:\\NGANH_HO_CNTT\\ThucHanhLTWNC\\BookHubAPI\\BookHubAPI\\Program.cs",
+              "RelativeToolTip": "BookHubAPI\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T20:46:15.909Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "D:\\NGANH_HO_CNTT\\ThucHanhLTWNC\\BookHubAPI\\BookHubAPI\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "BookHubAPI\\Controllers\\AuthController.cs",
+              "ToolTip": "D:\\NGANH_HO_CNTT\\ThucHanhLTWNC\\BookHubAPI\\BookHubAPI\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "BookHubAPI\\Controllers\\AuthController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T20:45:36.957Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

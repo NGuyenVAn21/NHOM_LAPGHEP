@@ -6,6 +6,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -102,13 +103,14 @@ public class BookDetailActivity extends AppCompatActivity {
                 showToast("Đã thêm vào giỏ hàng");
             }
         });
-
         findViewById(R.id.readButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showToast("Mở sách để đọc");
+                Intent intent = new Intent(BookDetailActivity.this, ReadingActivity.class);
+                startActivity(intent);
             }
         });
+
     }
 
     private void toggleFavorite() {

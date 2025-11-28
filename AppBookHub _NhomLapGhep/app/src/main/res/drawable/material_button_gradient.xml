@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:color="?android:attr/colorControlHighlight"> <!-- Sử dụng màu highlight mặc định của hệ thống cho hiệu ứng nhấn (ripple) -->
+
+    <item>
+
+        <shape android:shape="rectangle">
+
+            <!-- Gradient: Teal-Cyan sang Blue-Purple -->
+
+            <gradient
+
+                android:angle="0"
+
+                android:startColor="#00C4FF"
+
+            android:endColor="#7B61FF"
+            android:type="linear" />
+
+            <corners android:radius="30dp" />
+
+        </shape>
+
+    </item>
+
+</ripple>

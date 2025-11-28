@@ -176,6 +176,7 @@
                 android:layout_marginTop="32dp"
                 android:textColor="@android:color/white"
                 android:background="@drawable/material_button_gradient"
+                app:backgroundTint="@null"
                 app:cornerRadius="30dp"
                 app:icon="@drawable/ic_arrow_right"
                 app:iconTint="@android:color/white"

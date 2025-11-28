@@ -96,9 +96,13 @@ public class AccountActivity extends AppCompatActivity {
         findViewById(R.id.itemAbout).setOnClickListener(v ->
                 startActivity(new Intent(AccountActivity.this, AboutActivity.class)));
 
-        findViewById(R.id.itemLogout).setOnClickListener(v ->
-                Toast.makeText(AccountActivity.this, "Đăng xuất", Toast.LENGTH_SHORT).show());
+        findViewById(R.id.itemLogout).setOnClickListener(v -> {
+            Intent intent = new Intent(AccountActivity.this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
+            // 3. Bắt đầu chuyển trang
+            startActivity(intent);
+        });
         /* ---------------------------------------------------
          * 4. NÚT CHỈNH SỬA HỒ SƠ
          * --------------------------------------------------- */

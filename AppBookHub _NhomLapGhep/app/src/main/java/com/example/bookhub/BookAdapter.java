@@ -3,12 +3,14 @@ package com.example.bookhub;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView; // 1. Thêm import ImageView
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide; // 2. Thêm import Glide
 import com.example.bookhub.Book;
 import com.example.bookhub.R;
 
@@ -55,12 +57,17 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     }
 
     static class BookViewHolder extends RecyclerView.ViewHolder {
+        // 3. Khai báo biến ImageView
+        private ImageView bookImage;
+
         private TextView bookTitle, bookAuthor, bookRating, bookPages, bookStatus;
         private View statusAvailable, statusBorrowed;
         private CardView bookCard;
 
         public BookViewHolder(@NonNull View itemView) {
             super(itemView);
+            // 4. Ánh xạ ID (Lưu ý: Trong file item_book.xml của bạn phải có ImageView với id là bookImage)
+            bookImage = itemView.findViewById(R.id.bookImage);
             bookTitle = itemView.findViewById(R.id.bookTitle);
             bookAuthor = itemView.findViewById(R.id.bookAuthor);
             bookRating = itemView.findViewById(R.id.bookRating);
@@ -77,6 +84,18 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
             bookRating.setText("⭐ " + book.getRating());
             bookPages.setText(book.getPages() + " trang");
             bookStatus.setText(book.getStatus());
+
+            // --- 5. LOAD ẢNH BẰNG GLIDE ---
+            if (book.getImageUrl() != null && !book.getImageUrl().isEmpty()) {
+                Glide.with(itemView.getContext())
+                        .load(book.getImageUrl())                       // Link ảnh từ API
+                        .placeholder(R.drawable.ic_launcher_background) // Ảnh hiển thị khi đang tải
+                        .error(R.drawable.ic_launcher_foreground)       // Ảnh hiển thị nếu link lỗi
+                        .into(bookImage);                               // Đẩy ảnh vào ImageView
+            } else {
+
+                bookImage.setImageResource(R.drawable.ic_launcher_foreground);
+            }
 
             // Cập nhật hiển thị trạng thái
             if ("Có sẵn".equals(book.getStatus())) {

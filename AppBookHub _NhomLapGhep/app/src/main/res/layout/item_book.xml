@@ -13,20 +13,14 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Book Cover -->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="160dp"
-            android:background="@drawable/gradient_book_cover">
-
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/ic_book"
-                android:layout_centerInParent="true"
-                app:tint="@color/white" />
-
-            <!-- Status Badge -->
+            android:layout_height="200dp"> <ImageView
+            android:id="@+id/bookImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/gradient_book_cover" />
             <LinearLayout
                 android:id="@+id/statusAvailable"
                 android:layout_width="wrap_content"
@@ -73,23 +67,20 @@
 
         </RelativeLayout>
 
-        <!-- Book Info -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/bookTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Nhà Giả Kim"
-                android:textColor="@color/black"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:maxLines="2"
-                android:ellipsize="end" />
+            android:padding="12dp"> <TextView
+            android:id="@+id/bookTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nhà Giả Kim"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:maxLines="2"
+            android:ellipsize="end" />
 
             <TextView
                 android:id="@+id/bookAuthor"
@@ -127,7 +118,6 @@
 
             </LinearLayout>
 
-            <!-- Status Text -->
             <TextView
                 android:id="@+id/bookStatus"
                 android:layout_width="match_parent"

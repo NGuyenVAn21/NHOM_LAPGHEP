@@ -1,15 +1,15 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
-// 1. Thêm dịch vụ Controllers (Dòng này rất quan trọng để nhận diện thư mục Controllers)
+// Add services to the container.
+
 builder.Services.AddControllers();
-
-// 2. Cấu hình Swagger (để test API)
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// 3. Cấu hình HTTP request pipeline.
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -17,10 +17,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseStaticFiles();
 app.UseAuthorization();
 
-// 4. Kích hoạt Controllers (Dòng này giúp API chạy được)
 app.MapControllers();
 
 app.Run();

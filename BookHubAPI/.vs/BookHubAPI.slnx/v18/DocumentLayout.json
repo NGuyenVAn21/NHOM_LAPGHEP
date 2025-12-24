@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\ADMIN\\Desktop\\AppBookHub\\NHOM_LAPGHEP\\BookHubAPI\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{14CBA810-6B5F-47E3-836E-21BA59C63CA7}|BookHubAPI\\BookHubAPI.csproj|c:\\users\\admin\\desktop\\appbookhub\\nhom_lapghep\\bookhubapi\\bookhubapi\\controllers\\bookscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{14CBA810-6B5F-47E3-836E-21BA59C63CA7}|BookHubAPI\\BookHubAPI.csproj|solutionrelative:bookhubapi\\controllers\\bookscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\NGANH_HO_CNTT\\ThucHanhLTWNC\\BookHubAPI\\BookHubAPI\\Controllers\\AuthController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -34,6 +38,19 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "BooksController.cs",
+              "DocumentMoniker": "C:\\Users\\ADMIN\\Desktop\\AppBookHub\\NHOM_LAPGHEP\\BookHubAPI\\BookHubAPI\\Controllers\\BooksController.cs",
+              "RelativeDocumentMoniker": "BookHubAPI\\Controllers\\BooksController.cs",
+              "ToolTip": "C:\\Users\\ADMIN\\Desktop\\AppBookHub\\NHOM_LAPGHEP\\BookHubAPI\\BookHubAPI\\Controllers\\BooksController.cs",
+              "RelativeToolTip": "BookHubAPI\\Controllers\\BooksController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-24T04:32:18.378Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "AuthController.cs",
               "DocumentMoniker": "D:\\NGANH_HO_CNTT\\ThucHanhLTWNC\\BookHubAPI\\BookHubAPI\\Controllers\\AuthController.cs",
               "ToolTip": "D:\\NGANH_HO_CNTT\\ThucHanhLTWNC\\BookHubAPI\\BookHubAPI\\Controllers\\AuthController.cs",

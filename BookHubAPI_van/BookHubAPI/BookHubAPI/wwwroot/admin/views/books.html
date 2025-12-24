@@ -1,0 +1,183 @@
+﻿<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-primary">📚 Quản lý Sách</h2>
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#bookModal">
+        <i class="fas fa-plus me-1"></i> Thêm sách
+    </button>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <select class="form-select" id="categoryFilter">
+            <option value="">Tất cả danh mục</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <input type="text" class="form-control" placeholder="Tìm theo tên, tác giả..." id="searchInput">
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-primary" id="searchBtn">Tìm</button>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Bìa</th>
+                <th>Tên sách</th>
+                <th>Tác giả</th>
+                <th>Danh mục</th>
+                <th>Trạng thái</th>
+                <th>Tồn kho</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody id="bookTable">
+            <!-- Dữ liệu sẽ load bằng JS -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal Thêm/Sửa -->
+<div class="modal fade" id="bookModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm sách mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="bookId">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tên sách *</label>
+                        <input type="text" class="form-control" id="title" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tác giả *</label>
+                        <input type="text" class="form-control" id="author" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Danh mục *</label>
+                        <select class="form-select" id="categoryId" required></select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Giá (VND)</label>
+                        <input type="number" class="form-control" id="price" value="0">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="description" rows="3"></textarea>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Tồn kho</label>
+                        <input type="number" class="form-control" id="stockQuantity" value="1">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label">URL ảnh bìa</label>
+                        <input type="text" class="form-control" id="coverImageUrl">
+                        <div class="mt-2">
+                            <img id="coverPreview" src="https://via.placeholder.com/150" width="100" class="border rounded">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="saveBookBtn">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let books = [];
+    let categories = [];
+
+    async function loadBooks() {
+        try {
+            const booksRes = await fetch('/api/books');
+            const catsRes = await fetch('/api/categories');
+            books = await booksRes.json();
+            categories = await catsRes.json();
+
+            // Load categories vào select
+            const select = document.getElementById('categoryId');
+            select.innerHTML = '<option value="">Chọn danh mục</option>';
+            categories.forEach(cat => {
+                select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+            });
+
+            renderBooks();
+        } catch (err) {
+            console.error('Lỗi load sách:', err);
+        }
+    }
+
+    function renderBooks() {
+        const tbody = document.getElementById('bookTable');
+        tbody.innerHTML = books.map(book => `
+            <tr>
+                <td>${book.id}</td>
+                <td><img src="${book.coverImageUrl || 'https://via.placeholder.com/40'}" class="cover-img"></td>
+                <td>${book.title}</td>
+                <td>${book.author}</td>
+                <td>${book.category}</td>
+                <td><span class="badge bg-${book.status === 'Có sẵn' ? 'success' : 'danger'}">${book.status}</span></td>
+                <td>${book.stock}</td>
+                <td>
+                    <button class="btn btn-sm btn-warning me-1" onclick="editBook(${book.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteBook(${book.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function saveBook() {
+        const id = document.getElementById('bookId').value;
+        const book = {
+            title: document.getElementById('title').value,
+            author: document.getElementById('author').value,
+            categoryId: parseInt(document.getElementById('categoryId').value) || null,
+            price: parseFloat(document.getElementById('price').value) || 0,
+            description: document.getElementById('description').value,
+            stockQuantity: parseInt(document.getElementById('stockQuantity').value) || 1,
+            coverImageUrl: document.getElementById('coverImageUrl').value
+        };
+
+        try {
+            if (id) {
+                await fetch(`/api/books/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(book)
+                });
+            } else {
+                await fetch('/api/books', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(book)
+                });
+            }
+            await loadBooks();
+            bootstrap.Modal.getInstance(document.getElementById('bookModal')).hide();
+            alert('Lưu thành công!');
+        } catch (err) {
+            alert('Lỗi: ' + err.message);
+        }
+    }
+
+    // Khởi chạy khi vào trang
+    document.addEventListener('DOMContentLoaded', () => {
+        loadBooks();
+        document.getElementById('saveBookBtn').addEventListener('click', saveBook);
+        document.getElementById('coverImageUrl').addEventListener('input', (e) => {
+            document.getElementById('coverPreview').src = e.target.value || 'https://via.placeholder.com/150';
+        });
+    });
+</script>

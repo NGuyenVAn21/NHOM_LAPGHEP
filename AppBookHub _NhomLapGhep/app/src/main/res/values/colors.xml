@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Primary Colors -->
+    <color name="primary_color">#6C63FF</color>
+    <color name="primary_dark">#5A52D5</color>
+    <color name="primary_light">#E6E4FF</color>
+
+    <!-- Secondary Colors -->
+    <color name="secondary_color">#FF6584</color>
+    <color name="secondary_light">#FFE6EB</color>
+
+    <!-- Accent Color -->
+    <color name="accent_color">#36D1DC</color>
+    <color name="accent_start">#36D1DC</color>
+    <color name="accent_end">#5B86E5</color>
+
+    <!-- Màu cơ bản -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#1E1E2D</color>
+    <color name="dark_grey">#4A4A6A</color>
+    <color name="grey">#8A8AA3</color>
+    <color name="light_grey">#C5C5D6</color>
+    <color name="background_grey">#F8F9FF</color>
+    <color name="divider_grey">#E2E4F0</color>
+
+    <!-- Status Colors -->
+    <color name="success_green">#2ECC71</color>
+    <color name="warning_orange">#FF9E64</color>
+    <color name="error_red">#FF4757</color>
+
+    <!-- Material Design 3 Colors -->
+    <color name="purple_200">#6C63FF</color>
+    <color name="purple_500">#5A52D5</color>
+    <color name="purple_700">#4A44B8</color>
+    <color name="teal_200">#36D1DC</color>
+    <color name="teal_700">#2AA8B3</color>
+    <color name="bg_app">#F5F7FA</color>
+    <color name="primary_blue">#40C4FF</color>
+    <color name="black_app">#1E1E2D</color>
+    <color name="grey_text">#8A8AA3</color>
+    <color name="btn_pink">#FF6B81</color>
+    <color name="btn_purple_light">#EDE7F6</color>
+    <color name="text_purple">#6200EE</color>
+    <color name="btn_teal">#26C6DA</color>
+    <color name="status_borrowing_bg">#E8EAF6</color>
+    <color name="status_borrowing_text">#3F51B5</color>
+    <color name="status_overdue_bg">#FFEBEE</color>
+    <color name="status_overdue_text">#F44336</color>
+</resources>

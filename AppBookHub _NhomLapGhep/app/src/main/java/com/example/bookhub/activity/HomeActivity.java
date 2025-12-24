@@ -10,9 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.bookhub.R;
 import com.example.bookhub.adapter.BookAdapter;
+import com.example.bookhub.adapter.EventHomeAdapter;
 import com.example.bookhub.adapter.HomeAdapter; // Dùng Adapter mới
 import com.example.bookhub.api.RetrofitClient;
 import com.example.bookhub.model.Book;
+import com.example.bookhub.model.Event;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.List;
 import retrofit2.Call;
@@ -40,6 +42,7 @@ public class HomeActivity extends AppCompatActivity {
 
         // 3. Gọi API lấy sách
         fetchBooks();
+        fetchEvents();
 
         // 4. Cài đặt Footer (Bottom Navigation)
         setupBottomNavigation();
@@ -74,6 +77,28 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<Book>> call, Throwable t) {
                 Toast.makeText(HomeActivity.this, "Lỗi API: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchEvents() {
+        RetrofitClient.getApiService().getAllEvents().enqueue(new Callback<List<Event>>() {
+            @Override
+            public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    // SỬA ĐOẠN NÀY: Dùng EventHomeAdapter mới
+                    EventHomeAdapter eventAdapter = new EventHomeAdapter(HomeActivity.this, response.body());
+
+                    // Giả sử bạn có RecyclerView id là recycler_events_home
+                    RecyclerView recyclerEvents = findViewById(R.id.recycler_events_featured); // ID trong layout home
+                    recyclerEvents.setLayoutManager(new LinearLayoutManager(HomeActivity.this, LinearLayoutManager.HORIZONTAL, false));
+                    recyclerEvents.setAdapter(eventAdapter);
+                }
+            }
+            @Override
+            public void onFailure(Call<List<Event>> call, Throwable t) {
+                // Khi mất mạng hoặc lỗi server thì báo lỗi ra
+                Toast.makeText(HomeActivity.this, "Lỗi tải sự kiện: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.BookHub"
+
+        android:usesCleartextTraffic="true"
+        >
+
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false"
+            android:label="Đăng ký" />
+
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".EventsActivity"
+            android:exported="false"
+            android:label="Sự kiện" />
+        <activity
+            android:name=".EventDetailActivity"
+            android:exported="false"
+            android:label="Chi tiết Sự kiện" />
+
+        <activity
+            android:name=".BookDetailActivity"
+            android:exported="false"
+            android:label="Chi tiết Sách" />
+        <activity
+            android:name=".BookSearchActivity"
+            android:exported="false"
+            android:label="Tìm kiếm Sách" />
+        <activity
+            android:name=".ReadingActivity"
+            android:exported="false"
+            android:label="Đọc Sách" />
+
+        <activity
+            android:name=".AccountActivity"
+            android:exported="false"
+            android:label="Tài khoản" />
+        <activity
+            android:name=".EditProfileActivity"
+            android:exported="false"
+            android:label="Chỉnh sửa hồ sơ" />
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="Cài đặt" />
+        <activity
+            android:name=".NotificationSettingsActivity"
+            android:exported="false"
+            android:label="Cài đặt thông báo" />
+
+        <activity
+            android:name=".BorrowHistoryActivity"
+            android:exported="false"
+            android:label="Lịch sử mượn" />
+        <activity
+            android:name=".ReadHistoryActivity"
+            android:exported="false"
+            android:label="Lịch sử đọc" />
+        <activity
+            android:name=".FavoriteActivity"
+            android:exported="false"
+            android:label="Sách yêu thích" />
+        <activity
+            android:name=".RatedBooksActivity"
+            android:exported="false"
+            android:label="Sách đã đánh giá" />
+
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false"
+            android:label="Giới thiệu" />
+        <activity
+            android:name=".HelpActivity"
+            android:exported="false"
+            android:label="Trợ giúp" />
+        <activity
+            android:name=".InfoActivity"
+            android:exported="false"
+            android:label="Thông tin ứng dụng" />
+
+    </application>
+
+</manifest>

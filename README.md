@@ -1,4 +1,4 @@
-# Đồ án Nhóm - Lập Ghép
+# Đồ án Nhóm : : LẮP GHÉP
 
 ## Thành viên:
 - Nguyễn Đình Văn (Nhóm trưởng)
@@ -6,3 +6,5 @@
 - Trương Hồng Anh
 - Võ Đức Tống
 - Tô Đông Cẩn
+
+## Tên đề tài app : Quản lý thư viện

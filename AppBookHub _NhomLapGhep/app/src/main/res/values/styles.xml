@@ -1,22 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base application theme. -->
-    <style name="Theme.Bookk" parent="Theme.Material3.DayNight">
-        <item name="colorPrimary">@color/primary_color</item>
-        <item name="colorPrimaryVariant">@color/primary_dark</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <item name="colorSecondary">@color/accent_color</item>
-        <item name="colorSecondaryVariant">@color/primary_dark</item>
-        <item name="colorOnSecondary">@color/white</item>
-        <item name="android:statusBarColor">@color/primary_dark</item>
-        <item name="android:navigationBarColor">@color/white</item>
+
+    <!-- ========================== -->
+    <!-- DETAIL STYLES -->
+    <!-- ========================== -->
+    <style name="DetailRowStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:gravity">center_vertical</item>
     </style>
 
+    <style name="DetailLabelStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/grey_text</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="DetailValueStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/black_app</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:gravity">end</item>
+    </style>
+
+    <!-- ========================== -->
+    <!-- BOTTOM NAVIGATION STYLES -->
+    <!-- ========================== -->
+    <style name="BottomNavItemStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="BottomNavIconStyle">
+        <item name="android:layout_width">22dp</item>
+        <item name="android:layout_height">22dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+    </style>
+
+    <style name="BottomNavTextStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <!-- ========================== -->
+    <!-- READING BUTTON STYLE -->
+    <!-- ========================== -->
     <style name="ReadingButton" parent="Widget.Material3.Button">
         <item name="android:padding">16dp</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:letterSpacing">0.5</item>
+        <item name="android:letterSpacing">0.05</item>
         <item name="cornerRadius">12dp</item>
         <item name="android:elevation">6dp</item>
     </style>
+
 </resources>

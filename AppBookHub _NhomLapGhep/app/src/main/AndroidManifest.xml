@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.bookhub">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -14,6 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BookHub"
+<<<<<<< HEAD
 
         android:usesCleartextTraffic="true"
         >
@@ -21,12 +26,23 @@
         <activity
             android:name=".LoginActivity"
             android:exported="true">
+=======
+        android:usesCleartextTraffic="true"
+        tools:targetApi="31">
+
+        <!-- Màn hình đăng nhập (khởi động đầu tiên) -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BookHub.NoActionBar">
+>>>>>>> c2cac68d4af52a97d36a6f7803a2b9c2807cb0c6
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+<<<<<<< HEAD
         <activity
             android:name=".RegisterActivity"
             android:exported="false"
@@ -108,6 +124,158 @@
             android:name=".InfoActivity"
             android:exported="false"
             android:label="Thông tin ứng dụng" />
+=======
+        <!-- Màn hình đăng ký -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BookHub.NoActionBar"
+            android:parentActivityName=".LoginActivity" />
+
+        <!-- Trang chủ chính (sau khi đăng nhập) -->
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BookHub.NoActionBar" />
+
+        <!-- Tab Sách - Tìm kiếm sách -->
+        <activity
+            android:name=".BookSearchActivity"
+            android:exported="false"
+            android:label="Sách"
+            android:theme="@style/Theme.BookHub.NoActionBar"
+            android:parentActivityName=".HomeActivity" />
+
+        <!-- Chi tiết sách -->
+        <activity
+            android:name=".BookDetailActivity"
+            android:exported="false"
+            android:label="Chi tiết sách"
+            android:theme="@style/Theme.BookHub.NoActionBar"
+            android:parentActivityName=".BookSearchActivity" />
+
+        <!-- Màn hình đọc sách chi tiết -->
+        <activity
+            android:name=".ReadingActivity"
+            android:exported="false"
+            android:label="Đọc sách"
+            android:theme="@style/Theme.BookHub.NoActionBar"
+            android:parentActivityName=".BookDetailActivity" />
+
+        <!-- Tab Mượn sách -->
+        <activity
+            android:name=".BorrowHistoryActivity"
+            android:exported="false"
+            android:label="Mượn sách"
+            android:theme="@style/Theme.BookHub.NoActionBar"
+            android:parentActivityName=".HomeActivity" />
+
+        <!-- Tab Tài khoản -->
+        <activity
+            android:name=".AccountActivity"
+            android:exported="false"
+            android:label="Tài khoản"
+            android:theme="@style/Theme.BookHub.NoActionBar"
+            android:parentActivityName=".HomeActivity" />
+
+        <!-- Thông tin tài khoản -->
+        <activity
+            android:name=".InfoActivity"
+            android:exported="false"
+            android:label="Thông tin"
+            android:theme="@style/Theme.BookHub.NoActionBar"
+            android:parentActivityName=".AccountActivity" />
+
+        <!-- Chỉnh sửa profile -->
+        <activity
+            android:name=".EditProfileActivity"
+            android:exported="false"
+            android:label="Chỉnh sửa hồ sơ"
+            android:theme="@style/Theme.BookHub.NoActionBar"
+            android:parentActivityName=".InfoActivity" />
+
+        <!-- Sách yêu thích -->
+        <activity
+            android:name=".FavoriteActivity"
+            android:exported="false"
+            android:label="Sách yêu thích"
+            android:theme="@style/Theme.BookHub.NoActionBar"
+            android:parentActivityName=".AccountActivity" />
+
+        <!-- Lịch sử đọc -->
+        <activity
+            android:name=".ReadHistoryActivity"
+            android:exported="false"
+            android:label="Lịch sử đọc"
+            android:theme="@style/Theme.BookHub.NoActionBar"
+            android:parentActivityName=".AccountActivity" />
+
+        <!-- Sách được đánh giá -->
+        <activity
+            android:name=".RatedBooksActivity"
+            android:exported="false"
+            android:label="Sách được đánh giá"
+            android:theme="@style/Theme.BookHub.NoActionBar"
+            android:parentActivityName=".AccountActivity" />
+
+        <!-- Cài đặt thông báo -->
+        <activity
+            android:name=".NotificationSettingsActivity"
+            android:exported="false"
+            android:label="Cài đặt thông báo"
+            android:theme="@style/Theme.BookHub.NoActionBar"
+            android:parentActivityName=".SettingsActivity" />
+
+        <!-- Cài đặt chung -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="Cài đặt"
+            android:theme="@style/Theme.BookHub.NoActionBar"
+            android:parentActivityName=".AccountActivity" />
+
+        <!-- Trợ giúp -->
+        <activity
+            android:name=".HelpActivity"
+            android:exported="false"
+            android:label="Trợ giúp"
+            android:theme="@style/Theme.BookHub.NoActionBar"
+            android:parentActivityName=".AccountActivity" />
+
+        <!-- Về ứng dụng -->
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false"
+            android:label="Về ứng dụng"
+            android:theme="@style/Theme.BookHub.NoActionBar"
+            android:parentActivityName=".AccountActivity" />
+
+        <!-- Hoạt động khác (nếu cần) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BookHub.NoActionBar" />
+
+        <activity
+            android:name=".MyBooksActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BookHub.NoActionBar" />
+
+        <!-- Sự kiện (nếu dùng) -->
+        <activity
+            android:name=".EventsActivity"
+            android:exported="false"
+            android:label="Sự kiện"
+            android:theme="@style/Theme.BookHub.NoActionBar"
+            android:parentActivityName=".HomeActivity" />
+
+        <activity
+            android:name=".EventDetailActivity"
+            android:exported="false"
+            android:label="Chi tiết Sự kiện"
+            android:theme="@style/Theme.BookHub.NoActionBar"
+            android:parentActivityName=".EventsActivity" />
+>>>>>>> c2cac68d4af52a97d36a6f7803a2b9c2807cb0c6
 
     </application>
 

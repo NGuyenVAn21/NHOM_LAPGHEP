@@ -10,7 +10,10 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+<<<<<<< HEAD
 import com.bumptech.glide.Glide; // 2. Thêm import Glide
+=======
+>>>>>>> c2cac68d4af52a97d36a6f7803a2b9c2807cb0c6
 import com.example.bookhub.Book;
 import com.example.bookhub.R;
 

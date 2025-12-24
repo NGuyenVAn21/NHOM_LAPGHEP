@@ -35,4 +35,7 @@ public interface ApiService {
     @GET("api/events/check-status")
     Call<CheckStatusResponse> checkRegistrationStatus(@retrofit2.http.Query("userId") int userId,
                                                       @retrofit2.http.Query("eventId") int eventId);
+
+    @GET("api/stats/active-readers")
+    Call<List<com.example.bookhub.model.UserRank>> getActiveReaders();
 }

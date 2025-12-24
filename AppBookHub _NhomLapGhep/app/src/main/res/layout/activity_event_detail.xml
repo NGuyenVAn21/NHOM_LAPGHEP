@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_grey"
-    tools:context=".EventDetailActivity">
+    tools:context=".activity.EventDetailActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -18,34 +18,34 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <RelativeLayout
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:background="@drawable/gradient_header"
-                android:padding="24dp">
+                android:layout_height="250dp">
+
+                <ImageView
+                    android:id="@+id/img_detail_banner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/gradient_header" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#40000000"/>
 
                 <TextView
                     android:id="@+id/event_title_detail"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Tuần lễ Sách Mới"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="Tên Sự Kiện"
                     android:textColor="@color/white"
                     android:textSize="28sp"
                     android:textStyle="bold"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="60dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ưu đãi lớn cho độc giả"
-                    android:textColor="#EFEFEF"
-                    android:textSize="16sp"
-                    android:alpha="0.8"
-                    android:layout_below="@id/event_title_detail"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="8dp"/>
-            </RelativeLayout>
+                    android:padding="16dp"/>
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -68,10 +68,10 @@
                     android:id="@+id/event_description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
+                    android:textSize="16sp"
                     android:textColor="@color/dark_grey"
-                    android:lineSpacingExtra="4dp"
-                    android:text="Đây là mô tả chi tiết của sự kiện Tuần lễ Sách Mới..."/>
+                    android:lineSpacingExtra="6dp"
+                    android:text="Nội dung mô tả..."/>
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
@@ -87,16 +87,14 @@
                         android:orientation="vertical"
                         android:padding="20dp">
 
-                        <LinearLayout style="@style/DetailRowStyle">
-                            <TextView style="@style/DetailLabelStyle" android:text="Thời gian:"/>
-                            <TextView style="@style/DetailValueStyle" android:text="20/11/2023 - 27/11/2023" android:textStyle="bold"/>
+                        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp">
+                            <TextView android:text="Bắt đầu:" android:textStyle="bold" android:layout_width="100dp" android:layout_height="wrap_content"/>
+                            <TextView android:id="@+id/tv_start_date" android:text="20/11/2023" android:textColor="@color/black_app" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                         </LinearLayout>
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider_grey"/>
-
-                        <LinearLayout style="@style/DetailRowStyle">
-                            <TextView style="@style/DetailLabelStyle" android:text="Mức ưu đãi:"/>
-                            <TextView style="@style/DetailValueStyle" android:text="Giảm 15%" android:textColor="@color/primary_color" android:textStyle="bold"/>
+                        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+                            <TextView android:text="Kết thúc:" android:textStyle="bold" android:layout_width="100dp" android:layout_height="wrap_content"/>
+                            <TextView android:id="@+id/tv_end_date" android:text="27/11/2023" android:textColor="@color/black_app" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                         </LinearLayout>
 
                     </LinearLayout>
@@ -119,7 +117,6 @@
         android:layout_marginHorizontal="20dp"
         android:layout_marginBottom="24dp"
         app:cornerRadius="14dp"
-        android:elevation="10dp"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

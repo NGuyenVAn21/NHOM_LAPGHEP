@@ -115,6 +115,11 @@
             android:exported="false"
             android:label="Thông tin ứng dụng" />
 
+        <activity
+            android:name=".activity.UserDetailActivity"
+            android:exported="false"
+            android:label="" />
+
     </application>
 
 </manifest>

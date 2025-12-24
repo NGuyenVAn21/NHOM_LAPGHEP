@@ -45,7 +45,7 @@
               "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\NGANH_HO_CNTT\\ThucHanhLTWNC\\BookHubAPI\\BookHubAPI\\BookHubAPI.http",
               "ToolTip": "D:\\NGANH_HO_CNTT\\ThucHanhLTWNC\\BookHubAPI\\BookHubAPI\\BookHubAPI.http",
               "RelativeToolTip": "..\\..\\..\\..\\..\\NGANH_HO_CNTT\\ThucHanhLTWNC\\BookHubAPI\\BookHubAPI\\BookHubAPI.http",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003502|",
               "WhenOpened": "2025-12-23T08:40:58.251Z",
               "EditorCaption": ""
@@ -58,9 +58,10 @@
               "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\NGANH_HO_CNTT\\ThucHanhLTWNC\\BookHubAPI\\BookHubAPI\\Program.cs",
               "ToolTip": "D:\\NGANH_HO_CNTT\\ThucHanhLTWNC\\BookHubAPI\\BookHubAPI\\Program.cs",
               "RelativeToolTip": "..\\..\\..\\..\\..\\NGANH_HO_CNTT\\ThucHanhLTWNC\\BookHubAPI\\BookHubAPI\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-19T20:46:15.909Z"
+              "WhenOpened": "2025-11-19T20:46:15.909Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -70,9 +71,10 @@
               "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\NGANH_HO_CNTT\\ThucHanhLTWNC\\BookHubAPI\\BookHubAPI\\Controllers\\AuthController.cs",
               "ToolTip": "D:\\NGANH_HO_CNTT\\ThucHanhLTWNC\\BookHubAPI\\BookHubAPI\\Controllers\\AuthController.cs",
               "RelativeToolTip": "..\\..\\..\\..\\..\\NGANH_HO_CNTT\\ThucHanhLTWNC\\BookHubAPI\\BookHubAPI\\Controllers\\AuthController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHoAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAFkAAAAAAAAAAAAwwHoAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-19T20:45:36.957Z"
+              "WhenOpened": "2025-11-19T20:45:36.957Z",
+              "EditorCaption": ""
             }
           ]
         }

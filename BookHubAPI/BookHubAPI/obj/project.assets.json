@@ -649,11 +649,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\dh\\admin-app\\AppBookHub(CuoiKi)\\NHOM_LAPGHEP\\BookHubAPI\\BookHubAPI\\BookHubAPI.csproj",
+      "projectUniqueName": "C:\\Users\\ADMIN\\Desktop\\AppBookHub\\NHOM_LAPGHEP\\BookHubAPI\\BookHubAPI\\BookHubAPI.csproj",
       "projectName": "BookHubAPI",
-      "projectPath": "D:\\dh\\admin-app\\AppBookHub(CuoiKi)\\NHOM_LAPGHEP\\BookHubAPI\\BookHubAPI\\BookHubAPI.csproj",
+      "projectPath": "C:\\Users\\ADMIN\\Desktop\\AppBookHub\\NHOM_LAPGHEP\\BookHubAPI\\BookHubAPI\\BookHubAPI.csproj",
       "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-      "outputPath": "D:\\dh\\admin-app\\AppBookHub(CuoiKi)\\NHOM_LAPGHEP\\BookHubAPI\\BookHubAPI\\obj\\",
+      "outputPath": "C:\\Users\\ADMIN\\Desktop\\AppBookHub\\NHOM_LAPGHEP\\BookHubAPI\\BookHubAPI\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

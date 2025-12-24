@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "tfyGRtinT6M=",
+  "dgSpecHash": "c/JqNl6aCSg=",
   "success": true,
-  "projectFilePath": "D:\\dh\\admin-app\\AppBookHub(CuoiKi)\\NHOM_LAPGHEP\\BookHubAPI\\BookHubAPI\\BookHubAPI.csproj",
+  "projectFilePath": "C:\\Users\\ADMIN\\Desktop\\AppBookHub\\NHOM_LAPGHEP\\BookHubAPI\\BookHubAPI\\BookHubAPI.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.aspnetcore.openapi\\8.0.22\\microsoft.aspnetcore.openapi.8.0.22.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",

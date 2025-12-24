@@ -2,7 +2,10 @@ package com.example.bookhub.api;
 
 import com.example.bookhub.model.Book;
 import com.example.bookhub.model.Event;
+import com.example.bookhub.model.RegistrationRequest;
+import com.example.bookhub.model.CheckStatusResponse;
 import java.util.List;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -25,4 +28,11 @@ public interface ApiService {
 
     @GET("api/events")
     Call<List<Event>> getAllEvents();
+
+    @POST("api/events/register")
+    Call<ResponseBody> registerEvent(@Body RegistrationRequest request);
+
+    @GET("api/events/check-status")
+    Call<CheckStatusResponse> checkRegistrationStatus(@retrofit2.http.Query("userId") int userId,
+                                                      @retrofit2.http.Query("eventId") int eventId);
 }

@@ -55,8 +55,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         String finalImageUrl = imageUrl; // Biến tạm để dùng trong lambda
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, EventDetailActivity.class);
+            intent.putExtra("EVENT_ID", event.getId());
             intent.putExtra("EVENT_TITLE", event.getTitle());
-            // ... các putExtra khác ...
+            intent.putExtra("EVENT_DESC", event.getDescription());
+            intent.putExtra("EVENT_START", event.getStartDate());
+            intent.putExtra("EVENT_END", event.getEndDate());
             intent.putExtra("EVENT_IMAGE", finalImageUrl); // Gửi link đã ghép
             context.startActivity(intent);
         });

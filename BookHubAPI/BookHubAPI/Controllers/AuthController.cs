@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Data.SqlClient; // Thư viện kết nối SQL
+using System.Data.SqlClient;
 using System.Data;
 
 namespace BookHubAPI.Controllers
@@ -8,8 +8,6 @@ namespace BookHubAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        // Chuỗi kết nối tới SQL Server của bạn
-        // Lưu ý: Server=ADMIN-PC,1433 (Dấu phẩy nhé)
         private readonly string connectionString = "Server=ADMIN-PC,1433;Database=bookhub_db;User Id=sa;Password=123456;TrustServerCertificate=True;";
 
         // 1. API ĐĂNG KÝ
@@ -43,7 +41,7 @@ namespace BookHubAPI.Controllers
                         insertCmd.Parameters.AddWithValue("@fullName", request.FullName);
                         insertCmd.Parameters.AddWithValue("@email", request.Email);
                         insertCmd.Parameters.AddWithValue("@username", request.Username);
-                        insertCmd.Parameters.AddWithValue("@password", request.Password); // Thực tế nên mã hóa password
+                        insertCmd.Parameters.AddWithValue("@password", request.Password);
                         insertCmd.ExecuteNonQuery();
                     }
                 }

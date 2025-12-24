@@ -1,6 +1,5 @@
 package com.example.bookhub;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -8,15 +7,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.bookhub.api.ApiService;
+import com.example.bookhub.api.RegisterRequest;
+import com.example.bookhub.api.RetrofitClient;
 import com.google.android.material.button.MaterialButton;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText etFullName;
-    private EditText etEmail;
-    private EditText etUsername;
-    private EditText etPassword;
-    private EditText etConfirmPassword;
+    private EditText etFullName, etEmail, etUsername, etPassword, etConfirmPassword;
     private MaterialButton btnRegister;
     private TextView tvLogin;
     private ProgressBar progressBar;
@@ -26,7 +28,6 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        // Khởi tạo các view
         etFullName = findViewById(R.id.etFullName);
         etEmail = findViewById(R.id.etEmail);
         etUsername = findViewById(R.id.etUsername);
@@ -36,21 +37,8 @@ public class RegisterActivity extends AppCompatActivity {
         tvLogin = findViewById(R.id.tvLogin);
         progressBar = findViewById(R.id.progressBar);
 
-        // Xử lý sự kiện nút Đăng ký
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                handleRegister();
-            }
-        });
-
-        // Xử lý sự kiện chuyển sang Đăng nhập
-        tvLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); // Quay lại màn hình đăng nhập
-            }
-        });
+        btnRegister.setOnClickListener(v -> handleRegister());
+        tvLogin.setOnClickListener(v -> finish());
     }
 
     private void handleRegister() {
@@ -60,71 +48,44 @@ public class RegisterActivity extends AppCompatActivity {
         String password = etPassword.getText().toString().trim();
         String confirmPassword = etConfirmPassword.getText().toString().trim();
 
-        // Kiểm tra dữ liệu đầu vào
-        if (fullName.isEmpty()) {
-            etFullName.setError("Vui lòng nhập họ tên");
-            etFullName.requestFocus();
+        // Validation ( logic kiểm tra rỗng )
+        if (fullName.isEmpty() || email.isEmpty() || username.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        if (email.isEmpty()) {
-            etEmail.setError("Vui lòng nhập email");
-            etEmail.requestFocus();
-            return;
-        }
-
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.setError("Email không hợp lệ");
-            etEmail.requestFocus();
-            return;
-        }
-
-        if (username.isEmpty()) {
-            etUsername.setError("Vui lòng nhập tên đăng nhập");
-            etUsername.requestFocus();
-            return;
-        }
-
-        if (password.isEmpty()) {
-            etPassword.setError("Vui lòng nhập mật khẩu");
-            etPassword.requestFocus();
-            return;
-        }
-
-        if (password.length() < 6) {
-            etPassword.setError("Mật khẩu phải có ít nhất 6 ký tự");
-            etPassword.requestFocus();
-            return;
-        }
-
-        if (confirmPassword.isEmpty()) {
-            etConfirmPassword.setError("Vui lòng xác nhận mật khẩu");
-            etConfirmPassword.requestFocus();
-            return;
-        }
-
         if (!password.equals(confirmPassword)) {
             etConfirmPassword.setError("Mật khẩu không khớp");
-            etConfirmPassword.requestFocus();
             return;
         }
 
-        // Hiển thị progress bar
         progressBar.setVisibility(View.VISIBLE);
         btnRegister.setEnabled(false);
 
-        // Giả lập đăng ký thành công sau 1 giây
-        btnRegister.postDelayed(new Runnable() {
+        // 1. Tạo request
+        RegisterRequest request = new RegisterRequest(fullName, email, username, password);
+
+        // 2. Gọi API
+        RetrofitClient.getApiService().register(request).enqueue(new Callback<Void>() {
             @Override
-            public void run() {
+            public void onResponse(Call<Void> call, Response<Void> response) {
                 progressBar.setVisibility(View.GONE);
                 btnRegister.setEnabled(true);
 
-                Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-
-                // Quay lại màn hình đăng nhập
-                finish();
+                if (response.isSuccessful()) {
+                    Toast.makeText(RegisterActivity.this, "Đăng ký thành công! Hãy đăng nhập.", Toast.LENGTH_LONG).show();
+                    finish(); // Quay về màn hình Login
+                } else {
+                    // Xử lý lỗi (Ví dụ: Trùng username)
+                    Toast.makeText(RegisterActivity.this, "Đăng ký thất bại (Trùng tên/Email)", Toast.LENGTH_SHORT).show();
+                }
             }
-        }, 1000);
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                btnRegister.setEnabled(true);
+                Toast.makeText(RegisterActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

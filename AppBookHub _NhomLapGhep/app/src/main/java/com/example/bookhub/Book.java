@@ -2,37 +2,54 @@ package com.example.bookhub;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import com.google.gson.annotations.SerializedName;
 
 public class Book implements Parcelable {
+    // @SerializedName giúp ánh xạ tên trường trong JSON (từ API) vào biến Java
+    @SerializedName("id")
     private int id;
+    @SerializedName("title")
     private String title;
+    @SerializedName("author")
     private String author;
+    @SerializedName("rating")
     private float rating;
+    @SerializedName("pages")
     private int pages;
+    @SerializedName("status")
     private String status;
+    @SerializedName("category")
     private String category;
+    @SerializedName("publisher")
     private String publisher;
+    @SerializedName("year")
     private int year;
+    @SerializedName("description")
     private String description;
+    @SerializedName("price")
     private String price;
+    @SerializedName("reviews")
     private int reviews;
+    @SerializedName("imageUrl")
+    private String imageUrl;
 
-    public Book(int id, String title, String author, float rating, int pages,
-                String status, String category, String publisher, int year, String description) {
+    // Constructor rỗng (Cần thiết cho Gson)
+    public Book() {
+    }
+
+    // Constructor đầy đủ
+    public Book(int id, String title, String author, float rating, int pages, String status, String price, String description) {
         this.id = id;
         this.title = title;
         this.author = author;
         this.rating = rating;
         this.pages = pages;
         this.status = status;
-        this.category = category;
-        this.publisher = publisher;
-        this.year = year;
+        this.price = price;
         this.description = description;
-        this.price = "200.000 VND";
-        this.reviews = 2548;
     }
 
+    // Parcelable Implementation ( truyền dữ liệu giữa các màn hình)
     protected Book(Parcel in) {
         id = in.readInt();
         title = in.readString();
@@ -46,6 +63,7 @@ public class Book implements Parcelable {
         description = in.readString();
         price = in.readString();
         reviews = in.readInt();
+        imageUrl = in.readString();
     }
 
     public static final Creator<Book> CREATOR = new Creator<Book>() {
@@ -59,20 +77,6 @@ public class Book implements Parcelable {
             return new Book[size];
         }
     };
-
-    // Getters
-    public int getId() { return id; }
-    public String getTitle() { return title; }
-    public String getAuthor() { return author; }
-    public float getRating() { return rating; }
-    public int getPages() { return pages; }
-    public String getStatus() { return status; }
-    public String getCategory() { return category; }
-    public String getPublisher() { return publisher; }
-    public int getYear() { return year; }
-    public String getDescription() { return description; }
-    public String getPrice() { return price; }
-    public int getReviews() { return reviews; }
 
     @Override
     public int describeContents() {
@@ -93,6 +97,21 @@ public class Book implements Parcelable {
         dest.writeString(description);
         dest.writeString(price);
         dest.writeInt(reviews);
+        dest.writeString(imageUrl);
     }
 
+    // Getters
+    public int getId() { return id; }
+    public String getTitle() { return title; }
+    public String getAuthor() { return author; }
+    public float getRating() { return rating; }
+    public int getPages() { return pages; }
+    public String getStatus() { return status; }
+    public String getCategory() { return category == null ? "Tổng hợp" : category; }
+    public String getPublisher() { return publisher == null ? "NXB Kim Đồng" : publisher; }
+    public int getYear() { return year == 0 ? 2024 : year; }
+    public String getDescription() { return description; }
+    public String getPrice() { return price; }
+    public int getReviews() { return reviews; }
+    public String getImageUrl() { return imageUrl; }
 }

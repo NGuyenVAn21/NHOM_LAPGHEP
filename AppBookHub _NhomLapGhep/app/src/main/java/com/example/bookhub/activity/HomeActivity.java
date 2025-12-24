@@ -12,9 +12,11 @@ import com.example.bookhub.R;
 import com.example.bookhub.adapter.BookAdapter;
 import com.example.bookhub.adapter.EventHomeAdapter;
 import com.example.bookhub.adapter.HomeAdapter; // Dùng Adapter mới
+import com.example.bookhub.adapter.UserRankAdapter;
 import com.example.bookhub.api.RetrofitClient;
 import com.example.bookhub.model.Book;
 import com.example.bookhub.model.Event;
+import com.example.bookhub.model.UserRank;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.List;
 import retrofit2.Call;
@@ -22,7 +24,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity {
-
+    private RecyclerView recyclerActiveReaders;
     private RecyclerView recyclerNewBooks, recyclerPopularBooks;
     private BottomNavigationView bottomNavigationView;
 
@@ -32,6 +34,8 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         // 1. Ánh xạ View
+        recyclerActiveReaders = findViewById(R.id.recycler_active_readers);
+        recyclerActiveReaders.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerNewBooks = findViewById(R.id.recycler_new_books);
         recyclerPopularBooks = findViewById(R.id.recycler_popular_books); // Ánh xạ thêm cái này
         bottomNavigationView = findViewById(R.id.bottom_navigation_view);
@@ -39,10 +43,12 @@ public class HomeActivity extends AppCompatActivity {
         // 2. Cài đặt RecyclerView nằm NGANG (Horizontal)
         recyclerNewBooks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         recyclerPopularBooks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        recyclerActiveReaders.setNestedScrollingEnabled(false);
 
         // 3. Gọi API lấy sách
         fetchBooks();
         fetchEvents();
+        fetchActiveReaders();
 
         // 4. Cài đặt Footer (Bottom Navigation)
         setupBottomNavigation();
@@ -136,6 +142,21 @@ public class HomeActivity extends AppCompatActivity {
                     return true;
                 }
                 return false;
+            }
+        });
+    }
+    private void fetchActiveReaders() {
+        RetrofitClient.getApiService().getActiveReaders().enqueue(new Callback<List<UserRank>>() {
+            @Override
+            public void onResponse(Call<List<UserRank>> call, Response<List<UserRank>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    UserRankAdapter adapter = new UserRankAdapter(HomeActivity.this, response.body());
+                    recyclerActiveReaders.setAdapter(adapter);
+                }
+            }
+            @Override
+            public void onFailure(Call<List<UserRank>> call, Throwable t) {
+                // Không làm gì hoặc log lỗi nhẹ
             }
         });
     }

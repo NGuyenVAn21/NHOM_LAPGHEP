@@ -1,11 +1,10 @@
-package com.example.bookhub;
+package com.example.bookhub.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -14,8 +13,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.bookhub.R;
+import com.example.bookhub.adapter.BookAdapter;
 import com.example.bookhub.api.ApiService;
 import com.example.bookhub.api.RetrofitClient;
+import com.example.bookhub.model.Book;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;

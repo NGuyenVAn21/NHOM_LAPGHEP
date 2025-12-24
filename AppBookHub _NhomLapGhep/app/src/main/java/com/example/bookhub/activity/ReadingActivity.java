@@ -1,4 +1,4 @@
-package com.example.bookhub;
+package com.example.bookhub.activity;
 
 import android.os.Bundle;
 import android.widget.Button;
@@ -7,6 +7,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.bookhub.R;
 
 public class ReadingActivity extends AppCompatActivity {
 

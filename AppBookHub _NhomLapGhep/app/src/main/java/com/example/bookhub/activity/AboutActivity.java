@@ -1,13 +1,17 @@
-package com.example.bookhub;
+package com.example.bookhub.activity;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class RatedBooksActivity extends AppCompatActivity {
+import com.example.bookhub.R;
+
+
+public class
+AboutActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_rated_books);
+        setContentView(R.layout.activity_about);
     }
 }

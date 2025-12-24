@@ -1,6 +1,7 @@
 package com.example.bookhub.api;
 
-import com.example.bookhub.Book;
+import com.example.bookhub.model.Book;
+import com.example.bookhub.model.Event;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -21,4 +22,7 @@ public interface ApiService {
     // Gọi API Lấy sách
     @GET("api/books")
     Call<List<Book>> getAllBooks();
+
+    @GET("api/events")
+    Call<List<Event>> getAllEvents();
 }

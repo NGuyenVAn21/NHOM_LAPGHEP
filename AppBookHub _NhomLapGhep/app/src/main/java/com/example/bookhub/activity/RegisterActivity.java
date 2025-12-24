@@ -1,4 +1,4 @@
-package com.example.bookhub;
+package com.example.bookhub.activity;
 
 import android.os.Bundle;
 import android.view.View;
@@ -7,7 +7,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.bookhub.api.ApiService;
+
+import com.example.bookhub.R;
 import com.example.bookhub.api.RegisterRequest;
 import com.example.bookhub.api.RetrofitClient;
 import com.google.android.material.button.MaterialButton;

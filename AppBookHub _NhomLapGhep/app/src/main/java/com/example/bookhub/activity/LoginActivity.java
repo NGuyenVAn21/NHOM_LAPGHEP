@@ -1,4 +1,4 @@
-package com.example.bookhub;
+package com.example.bookhub.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.bookhub.R;
 import com.example.bookhub.api.ApiService;
 import com.example.bookhub.api.LoginRequest;
 import com.example.bookhub.api.LoginResponse;

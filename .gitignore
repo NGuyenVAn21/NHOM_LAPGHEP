@@ -3,3 +3,6 @@
 *.obj
 .vscode/
 .idea/
+BookHubAPI/.vs/
+BookHubAPI/BookHubAPI/obj/
+BookHubAPI/BookHubAPI/bin/

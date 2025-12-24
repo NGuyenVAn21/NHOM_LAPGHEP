@@ -1,4 +1,4 @@
-package com.example.bookhub;
+package com.example.bookhub.activity;
 
 import android.os.Bundle;
 import android.view.View;
@@ -11,7 +11,8 @@ import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.example.bookhub.Book;
+import com.example.bookhub.R;
+import com.example.bookhub.model.Book;
 
 public class BookDetailActivity extends AppCompatActivity {
 

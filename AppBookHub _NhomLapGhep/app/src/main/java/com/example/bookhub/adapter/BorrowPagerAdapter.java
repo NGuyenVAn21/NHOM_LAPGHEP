@@ -1,4 +1,4 @@
-package com.example.bookhub;
+package com.example.bookhub.adapter;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,6 +13,8 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
+
+import com.example.bookhub.R;
 import com.google.android.material.button.MaterialButton;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.example.bookhub;
+package com.example.bookhub.activity;
 
 import android.content.Intent;
 import android.os.Bundle;

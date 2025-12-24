@@ -1,6 +1,7 @@
 package com.example.bookhub.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,9 +56,16 @@ public class UserRankAdapter extends RecyclerView.Adapter<UserRankAdapter.ViewHo
                 .error(R.drawable.ic_user)
                 .into(holder.avatar);
 
-        // Đổi màu badge cho đẹp (Top 1 màu khác, Top 2,3 màu khác)
-        // Đây là code ví dụ đổi màu nền badge bằng code java nếu muốn
-        // holder.badge.setBackgroundResource(rank == 1 ? R.drawable.bg_badge_purple : R.drawable.bg_badge_blue);
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, com.example.bookhub.activity.UserDetailActivity.class);
+
+            intent.putExtra("USER_NAME", user.getName());
+            intent.putExtra("USER_AVATAR", user.getAvatar());
+            intent.putExtra("USER_BORROW_COUNT", user.getBorrowCount());
+            intent.putExtra("USER_RANK", rank); // Gửi thứ hạng sang
+
+            context.startActivity(intent);
+        });
     }
 
     @Override

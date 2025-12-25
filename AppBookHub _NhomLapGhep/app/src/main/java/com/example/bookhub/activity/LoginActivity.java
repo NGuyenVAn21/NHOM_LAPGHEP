@@ -108,6 +108,14 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     // TRƯỜNG HỢP THÀNH CÔNG
                     LoginResponse loginResponse = response.body();
+                    int userId = loginResponse.getUser().getId(); // <--- Lấy ID
+                    String fullName = loginResponse.getUser().getFullName();
+
+                    getSharedPreferences("BookHubPrefs", MODE_PRIVATE)
+                            .edit()
+                            .putInt("CURRENT_USER_ID", userId) // Lưu ID với khóa là "CURRENT_USER_ID"
+                            .putString("CURRENT_USER_NAME", fullName) // Lưu tên luôn để dùng sau này
+                            .apply();
 
                     // Hiển thị thông báo chào mừng
                     String welcomeMsg = "Xin chào " + loginResponse.getUser().getFullName();

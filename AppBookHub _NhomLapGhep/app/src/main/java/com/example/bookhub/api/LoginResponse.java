@@ -15,5 +15,6 @@ public class LoginResponse {
         private String email;
 
         public String getFullName() { return fullName; }
+        public int getId() { return id; }
     }
 }

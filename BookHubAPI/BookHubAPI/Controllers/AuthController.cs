@@ -18,7 +18,6 @@ namespace BookHubAPI.Controllers
             _configuration = configuration;
         }
 
-        // Helper: Lấy chuỗi kết nối gọn gàng
         private string GetConnectionString()
         {
             return _configuration.GetConnectionString("DefaultConnection");
@@ -29,12 +28,9 @@ namespace BookHubAPI.Controllers
         {
             try
             {
-                // Sửa đoạn này: Lấy connection string từ hàm GetConnectionString()
                 using (SqlConnection conn = new SqlConnection(GetConnectionString()))
                 {
                     conn.Open();
-
-                    // --- LOGIC CŨ GIỮ NGUYÊN ---
                     string checkSql = "SELECT COUNT(*) FROM Users WHERE username = @username OR email = @email";
                     using (SqlCommand checkCmd = new SqlCommand(checkSql, conn))
                     {
@@ -57,7 +53,6 @@ namespace BookHubAPI.Controllers
                         insertCmd.Parameters.AddWithValue("@password", request.Password);
                         insertCmd.ExecuteNonQuery();
                     }
-                    // ----------------------------
                 }
 
                 return Ok(new { status = "Success", message = "Đăng ký thành công!" });
@@ -73,12 +68,9 @@ namespace BookHubAPI.Controllers
         {
             try
             {
-                // Sửa đoạn này:
                 using (SqlConnection conn = new SqlConnection(GetConnectionString()))
                 {
                     conn.Open();
-
-                    // --- LOGIC CŨ GIỮ NGUYÊN ---
                     string sql = "SELECT user_id, full_name, email FROM Users WHERE username = @username AND password_hash = @password";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -109,7 +101,6 @@ namespace BookHubAPI.Controllers
                             }
                         }
                     }
-                    // ----------------------------
                 }
             }
             catch (Exception ex)

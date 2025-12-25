@@ -1,4 +1,4 @@
-package com.example.bookhub; // Hoặc com.example.bookhub.activity nếu bạn để ở đó
+package com.example.bookhub;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.bookhub.activity.ReadingActivity; // Import màn hình đọc
 import com.example.bookhub.api.RetrofitClient;
 import com.example.bookhub.models.ActionRequest;
 import com.example.bookhub.models.ActionResponse;
@@ -38,12 +38,11 @@ public class BorrowingFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private BorrowingAdapter adapter;
-    private List<BorrowRecord> borrowList = new ArrayList<>();
+    private List<BorrowRecord> list = new ArrayList<>();
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Đảm bảo tên file layout đúng là fragment_borrowing
         return inflater.inflate(R.layout.fragment_borrowing, container, false);
     }
 
@@ -51,41 +50,53 @@ public class BorrowingFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Ánh xạ RecyclerView (ID trong XML phải là recycler_borrowing)
+        // 1. Ánh xạ RecyclerView
         recyclerView = view.findViewById(R.id.recycler_borrowing);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        if (recyclerView == null) {
+            Toast.makeText(getContext(), "Lỗi: Không tìm thấy ID recycler_borrowing", Toast.LENGTH_LONG).show();
+            return;
+        }
 
-        adapter = new BorrowingAdapter(getContext(), borrowList, this);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new BorrowingAdapter(getContext(), list, this);
         recyclerView.setAdapter(adapter);
 
+        // 2. Gọi hàm tải dữ liệu
         loadData();
     }
 
     public void loadData() {
-        // Lấy UserID từ SharedPreferences
+        if (getContext() == null) return;
+
         SharedPreferences prefs = requireContext().getSharedPreferences("BookHubPrefs", Context.MODE_PRIVATE);
-        int userId = prefs.getInt("CURRENT_USER_ID", -1);
+        int uid = prefs.getInt("CURRENT_USER_ID", -1);
 
-        if (userId == -1) return;
+        if (uid == -1) {
+            Toast.makeText(getContext(), "Chưa đăng nhập (ID=-1)", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        RetrofitClient.getApiService().getCurrentBorrows(userId).enqueue(new Callback<List<BorrowRecord>>() {
+        RetrofitClient.getApiService().getCurrentBorrows(uid).enqueue(new Callback<List<BorrowRecord>>() {
             @Override
             public void onResponse(Call<List<BorrowRecord>> call, Response<List<BorrowRecord>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    borrowList.clear();
-                    borrowList.addAll(response.body());
+                    list.clear();
+                    list.addAll(response.body());
                     adapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(getContext(), "Lỗi API: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<List<BorrowRecord>> call, Throwable t) {
-                Toast.makeText(getContext(), "Lỗi tải dữ liệu: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                Log.e("BookHub", "Error", t);
             }
         });
     }
 
-    // --- ADAPTER NỘI BỘ (Để gọn code) ---
+    // ADAPTER NỘI BỘ
     public static class BorrowingAdapter extends RecyclerView.Adapter<BorrowingAdapter.ViewHolder> {
         private Context context;
         private List<BorrowRecord> list;
@@ -100,111 +111,104 @@ public class BorrowingFragment extends Fragment {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            // Đảm bảo tên layout item đúng là item_borrowing_book
             View view = LayoutInflater.from(context).inflate(R.layout.item_borrowing_book, parent, false);
             return new ViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            BorrowRecord record = list.get(position);
+            BorrowRecord b = list.get(position);
+            holder.title.setText(b.getTitle());
+            holder.date1.setText("Mượn: " + b.getBorrowDate());
+            holder.date2.setText("Hạn: " + b.getDueDate());
+            holder.status.setText(b.getDisplayStatus());
 
-            holder.tvTitle.setText(record.getTitle());
-            holder.tvBorrowDate.setText("Mượn: " + record.getBorrowDate());
-            holder.tvDueDate.setText("Hạn: " + record.getDueDate());
-            holder.tvStatus.setText(record.getDisplayStatus());
-
-            // Xử lý màu trạng thái
             try {
-                holder.tvStatus.setBackgroundColor(Color.parseColor(record.getStatusColor()));
+                holder.status.setBackgroundColor(Color.parseColor(b.getStatusColor()));
             } catch (Exception e) {
-                holder.tvStatus.setBackgroundColor(Color.GRAY);
+                holder.status.setBackgroundColor(Color.GRAY);
             }
 
-            // Load ảnh bìa
-            String imgUrl = record.getCoverUrl();
-            // Nếu server trả về thiếu http (ví dụ: "cover1.jpg") thì ghép vào
+            // Load ảnh
+            String imgUrl = b.getCoverUrl();
             if (imgUrl != null && !imgUrl.startsWith("http")) {
+
                 imgUrl = "http://10.0.2.2:5280/images/" + imgUrl;
             }
             Glide.with(context).load(imgUrl).placeholder(R.drawable.ic_menu_book_round).into(holder.imgCover);
 
-            // Nút TRẢ SÁCH
+            // Nút Trả sách
             holder.btnReturn.setOnClickListener(v -> {
                 new AlertDialog.Builder(context)
-                        .setTitle("Xác nhận trả sách")
-                        .setMessage("Bạn có chắc muốn trả cuốn sách này?")
-                        .setPositiveButton("Đồng ý", (dialog, which) -> callApiAction("return", record.getRecordId()))
+                        .setTitle("Trả sách")
+                        .setMessage("Xác nhận trả sách này?")
+                        .setPositiveButton("Đồng ý", (dialog, which) -> callApiAction("return", b.getRecordId()))
                         .setNegativeButton("Hủy", null)
                         .show();
             });
 
-            // Nút GIA HẠN
-            holder.btnRenew.setOnClickListener(v -> callApiAction("extend", record.getRecordId()));
-
-            // Nút XEM (Đọc sách)
+            // Nút Gia hạn
+            holder.btnRenew.setOnClickListener(v -> callApiAction("extend", b.getRecordId()));
             holder.btnView.setOnClickListener(v -> {
-                Intent intent = new Intent(context, ReadingActivity.class);
-                // Truyền dữ liệu sách sang màn hình đọc nếu cần
+                Intent intent = new Intent(context, com.example.bookhub.activity.BookDetailActivity.class);
+
+                // Tạo object Book tạm thời từ BorrowRecord để gửi sang màn hình chi tiết
+                com.example.bookhub.models.Book tempBook = new com.example.bookhub.models.Book(
+                        b.getBookId(),
+                        b.getTitle(),
+                        b.getAuthor(),
+                        0f, // Rating (float)
+                        0,  // Pages
+                        b.getDisplayStatus(), // Status
+                        // Lấy giá tiền từ API (Nếu null thì để 0 VND) ---
+                        b.getPrice() != null ? b.getPrice() : "0 VND",
+                        "Thông tin đang cập nhật..."
+                );
+
+                intent.putExtra("BOOK", tempBook);
+                intent.putExtra("BOOK_IMAGE", b.getCoverUrl());
                 context.startActivity(intent);
             });
         }
 
-        private void callApiAction(String actionType, int recordId) {
+        private void callApiAction(String type, int recordId) {
             SharedPreferences prefs = context.getSharedPreferences("BookHubPrefs", Context.MODE_PRIVATE);
-            int userId = prefs.getInt("CURRENT_USER_ID", -1);
+            int uid = prefs.getInt("CURRENT_USER_ID", -1);
+            ActionRequest req = new ActionRequest(uid, recordId);
 
-            ActionRequest request = new ActionRequest(userId, recordId);
-            Call<ActionResponse> call;
-
-            if (actionType.equals("return")) {
-                call = RetrofitClient.getApiService().returnBook(request);
-            } else {
-                call = RetrofitClient.getApiService().extendBook(request);
-            }
+            Call<ActionResponse> call = type.equals("return") ?
+                    RetrofitClient.getApiService().returnBook(req) :
+                    RetrofitClient.getApiService().extendBook(req);
 
             call.enqueue(new Callback<ActionResponse>() {
                 @Override
                 public void onResponse(Call<ActionResponse> call, Response<ActionResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
-                        if (response.body().isSuccess()) {
-                            fragment.loadData(); // Tải lại danh sách
-                        }
-                    } else {
-                        Toast.makeText(context, "Thao tác thất bại", Toast.LENGTH_SHORT).show();
+                        if (response.body().isSuccess()) fragment.loadData();
                     }
                 }
-                @Override
-                public void onFailure(Call<ActionResponse> call, Throwable t) {
-                    Toast.makeText(context, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
-                }
+                @Override public void onFailure(Call<ActionResponse> call, Throwable t) {}
             });
         }
 
-        @Override
-        public int getItemCount() { return list.size(); }
+        @Override public int getItemCount() { return list.size(); }
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
-            TextView tvTitle, tvBorrowDate, tvDueDate, tvStatus;
+            TextView title, date1, date2, status;
             MaterialButton btnReturn, btnRenew, btnView;
             ImageView imgCover;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
-                // Các ID này phải khớp trong file item_borrowing_book.xml
-                tvTitle = itemView.findViewById(R.id.text_title);
-                tvBorrowDate = itemView.findViewById(R.id.text_borrow_date);
-                tvDueDate = itemView.findViewById(R.id.text_due_date);
-                tvStatus = itemView.findViewById(R.id.text_status);
+                title = itemView.findViewById(R.id.text_title);
+                date1 = itemView.findViewById(R.id.text_borrow_date);
+                date2 = itemView.findViewById(R.id.text_due_date);
+                status = itemView.findViewById(R.id.text_status);
                 btnReturn = itemView.findViewById(R.id.btn_return);
                 btnRenew = itemView.findViewById(R.id.btn_renew);
                 btnView = itemView.findViewById(R.id.btn_view);
-
-                // Nếu item chưa có ID cho ảnh, hãy thêm id="@+id/imgBookCover" vào XML
-                // Ở đây tôi giả định bạn có hoặc sẽ thêm nó. Nếu không có, hãy comment dòng này.
-                imgCover = itemView.findViewById(R.id.bookImage); // Check lại ID ảnh trong layout item
-                if (imgCover == null) imgCover = itemView.findViewById(R.id.img_book_cover); // Dự phòng
+                imgCover = itemView.findViewById(R.id.bookImage);
             }
         }
     }

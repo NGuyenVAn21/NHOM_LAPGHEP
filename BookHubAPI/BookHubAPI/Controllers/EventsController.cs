@@ -17,7 +17,7 @@ namespace BookHubAPI.Controllers
             _configuration = configuration;
         }
 
-        // 1. API LẤY DANH SÁCH (Giữ nguyên logic cũ của bạn)
+        // 1. API LẤY DANH SÁCH
         [HttpGet]
         public IActionResult GetAllEvents()
         {
@@ -69,7 +69,7 @@ namespace BookHubAPI.Controllers
             }
         }
 
-        // 2. API ĐĂNG KÝ (Thêm mới đoạn này)
+        // 2. API ĐĂNG KÝ
         [HttpPost("register")]
         public IActionResult RegisterEvent([FromBody] RegistrationRequest req)
         {
@@ -106,8 +106,7 @@ namespace BookHubAPI.Controllers
                 return StatusCode(500, new { message = "Lỗi Server: " + ex.Message });
             }
         }
-        // ... (Các hàm cũ giữ nguyên) ...
-
+ 
         // 3. API KIỂM TRA TRẠNG THÁI ĐĂNG KÝ
         [HttpGet("check-status")]
         public IActionResult CheckRegistration(int userId, int eventId)

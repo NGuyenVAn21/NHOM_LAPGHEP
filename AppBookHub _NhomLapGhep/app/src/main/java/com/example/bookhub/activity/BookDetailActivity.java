@@ -1,32 +1,42 @@
 package com.example.bookhub.activity;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.example.bookhub.R;
+import com.example.bookhub.api.RetrofitClient;
+import com.example.bookhub.models.ActionResponse;
 import com.example.bookhub.models.Book;
+import com.example.bookhub.models.BorrowRequest;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class BookDetailActivity extends AppCompatActivity {
 
     private ImageView favoriteButton;
+    private Button borrowButton;
     private boolean isFavorite = false;
+    private Book currentBook; // Lưu biến toàn cục để dùng khi bấm nút
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_detail);
 
-        Book book = getIntent().getParcelableExtra("BOOK");
-        if (book != null) {
-            setupBookDetails(book);
+        currentBook = getIntent().getParcelableExtra("BOOK");
+        if (currentBook != null) {
+            setupBookDetails(currentBook);
         }
         setupClickListeners();
     }
@@ -49,25 +59,30 @@ public class BookDetailActivity extends AppCompatActivity {
         // Trạng thái
         TextView statusText = findViewById(R.id.statusValue);
         statusText.setText(book.getStatus());
-        if ("Có sẵn".equals(book.getStatus())) {
+
+        // Logic hiển thị màu và nút bấm
+        boolean isAvailable = "Có sẵn".equals(book.getStatus());
+
+        if (isAvailable) {
             statusText.setTextColor(ContextCompat.getColor(this, R.color.success_green));
         } else {
             statusText.setTextColor(ContextCompat.getColor(this, R.color.error_red));
         }
 
-        // Thiết lập nút hành động dựa trên trạng thái
-        setupActionButtons("Có sẵn".equals(book.getStatus()));
+        setupActionButtons(isAvailable);
     }
 
     private void setupActionButtons(boolean isAvailable) {
-        Button borrowButton = findViewById(R.id.borrowButton);
+        borrowButton = findViewById(R.id.borrowButton);
         Button cartButton = findViewById(R.id.cartButton);
         Button readButton = findViewById(R.id.readButton);
 
+        // Chỉ hiện nút Mượn nếu sách có sẵn
         if (isAvailable) {
             borrowButton.setVisibility(View.VISIBLE);
+            borrowButton.setEnabled(true); // Đảm bảo nút bấm được
             cartButton.setVisibility(View.VISIBLE);
-            readButton.setText("Đọc online");
+            readButton.setText("Đọc thử");
         } else {
             borrowButton.setVisibility(View.GONE);
             cartButton.setVisibility(View.GONE);
@@ -76,42 +91,77 @@ public class BookDetailActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        findViewById(R.id.backButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        findViewById(R.id.backButton).setOnClickListener(v -> finish());
 
         favoriteButton = findViewById(R.id.favoriteButton);
-        favoriteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleFavorite();
-            }
-        });
+        favoriteButton.setOnClickListener(v -> toggleFavorite());
 
-        findViewById(R.id.borrowButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showToast("Đã thêm vào danh sách mượn");
-            }
-        });
+        // --- XỬ LÝ SỰ KIỆN MƯỢN SÁCH ---
+        if (borrowButton != null) {
+            borrowButton.setOnClickListener(v -> {
+                performBorrowBook();
+            });
+        }
 
-        findViewById(R.id.cartButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showToast("Đã thêm vào giỏ hàng");
-            }
-        });
-        findViewById(R.id.readButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(BookDetailActivity.this, ReadingActivity.class);
-                startActivity(intent);
-            }
-        });
+        findViewById(R.id.cartButton).setOnClickListener(v -> showToast("Đã thêm vào giỏ hàng"));
 
+        findViewById(R.id.readButton).setOnClickListener(v -> {
+            Intent intent = new Intent(BookDetailActivity.this, ReadingActivity.class);
+            startActivity(intent);
+        });
+    }
+
+    // Hàm gọi API Mượn sách
+    private void performBorrowBook() {
+        if (currentBook == null) return;
+
+        // 1. Lấy UserID từ SharedPreferences
+        SharedPreferences prefs = getSharedPreferences("BookHubPrefs", MODE_PRIVATE);
+        int userId = prefs.getInt("CURRENT_USER_ID", -1);
+
+        if (userId == -1) {
+            showToast("Vui lòng đăng nhập lại để mượn sách");
+            return;
+        }
+
+        // Khóa nút để tránh bấm nhiều lần
+        borrowButton.setEnabled(false);
+        borrowButton.setText("Đang xử lý...");
+
+        // 2. Tạo Request
+        BorrowRequest request = new BorrowRequest(userId, currentBook.getId());
+
+        // 3. Gọi API
+        RetrofitClient.getApiService().borrowBook(request).enqueue(new Callback<ActionResponse>() {
+            @Override
+            public void onResponse(Call<ActionResponse> call, Response<ActionResponse> response) {
+                borrowButton.setEnabled(true);
+                borrowButton.setText("Mượn sách");
+
+                if (response.isSuccessful() && response.body() != null) {
+                    ActionResponse result = response.body();
+                    if (result.isSuccess()) {
+                        showToast("Thành công: " + result.getMessage());
+
+                        // Cập nhật lại trạng thái sách trên giao diện nếu cần
+                        // Hoặc chuyển hướng sang màn hình Quản lý mượn
+                        // Intent intent = new Intent(BookDetailActivity.this, BorrowHistoryActivity.class);
+                        // startActivity(intent);
+                    } else {
+                        showToast("Thất bại: " + result.getMessage());
+                    }
+                } else {
+                    showToast("Lỗi server hoặc sách đã hết hàng");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ActionResponse> call, Throwable t) {
+                borrowButton.setEnabled(true);
+                borrowButton.setText("Mượn sách");
+                showToast("Lỗi kết nối mạng: " + t.getMessage());
+            }
+        });
     }
 
     private void toggleFavorite() {

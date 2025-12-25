@@ -87,6 +87,7 @@ public class BorrowPagerAdapter extends FragmentStateAdapter {
 
         public void loadData() {
             int uid = getCurrentUserId(getContext());
+
             if (uid == -1) return;
 
             RetrofitClient.getApiService().getCurrentBorrows(uid).enqueue(new Callback<List<BorrowRecord>>() {

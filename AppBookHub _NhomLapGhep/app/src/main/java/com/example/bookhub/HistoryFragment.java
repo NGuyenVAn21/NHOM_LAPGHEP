@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.bookhub.R;
 import com.example.bookhub.api.RetrofitClient;
 import com.example.bookhub.models.BorrowRecord;
 
@@ -35,7 +36,6 @@ public class HistoryFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Layout: fragment_borrow_history (hoặc fragment_history tùy tên file của bạn)
         return inflater.inflate(R.layout.fragment_borrow_history, container, false);
     }
 
@@ -43,17 +43,26 @@ public class HistoryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // ID: recycler_history
         recyclerView = view.findViewById(R.id.recycler_history);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapter = new HistoryAdapter(getContext(), historyList);
         recyclerView.setAdapter(adapter);
 
-        loadData();
+        // KHÔNG gọi loadData() ở đây nữa, để tránh gọi 2 lần
     }
 
+    // --- THÊM HÀM NÀY: Để tự động tải lại mỗi khi chuyển Tab ---
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadData();
+    }
+    // -----------------------------------------------------------
+
     private void loadData() {
+        if (getContext() == null) return;
+
         SharedPreferences prefs = requireContext().getSharedPreferences("BookHubPrefs", Context.MODE_PRIVATE);
         int userId = prefs.getInt("CURRENT_USER_ID", -1);
 
@@ -70,7 +79,7 @@ public class HistoryFragment extends Fragment {
             }
             @Override
             public void onFailure(Call<List<BorrowRecord>> call, Throwable t) {
-                // Fail silently or log
+                // Có thể log lỗi nếu cần
             }
         });
     }
@@ -88,7 +97,9 @@ public class HistoryFragment extends Fragment {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_history_book, parent, false));
+            // Lưu ý: Đảm bảo bạn đang dùng đúng file layout item_history_book
+            View view = LayoutInflater.from(context).inflate(R.layout.item_history_book, parent, false);
+            return new ViewHolder(view);
         }
 
         @Override
@@ -98,9 +109,9 @@ public class HistoryFragment extends Fragment {
             holder.tvBorrowDate.setText("Mượn: " + record.getBorrowDate());
             holder.tvReturnDate.setText("Trả: " + record.getReturnDate());
             holder.tvStatus.setText("Đã trả");
-            // Set màu đỏ nhạt cho text Đã trả
             holder.tvStatus.setTextColor(Color.parseColor("#F44336"));
-            holder.tvStatus.setBackgroundColor(Color.parseColor("#FFEBEE"));
+
+            // Nếu item_history_book có background màu thì set ở đây nếu cần
         }
 
         @Override
@@ -112,7 +123,8 @@ public class HistoryFragment extends Fragment {
                 super(itemView);
                 tvTitle = itemView.findViewById(R.id.text_title);
                 tvBorrowDate = itemView.findViewById(R.id.text_borrow_date);
-                tvReturnDate = itemView.findViewById(R.id.text_return_date); // Đảm bảo ID này có trong item_history_book
+                // Đảm bảo file item_history_book.xml có ID text_return_date
+                tvReturnDate = itemView.findViewById(R.id.text_return_date);
                 tvStatus = itemView.findViewById(R.id.text_status);
             }
         }

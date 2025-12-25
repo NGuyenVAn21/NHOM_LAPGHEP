@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
+
+
 import com.example.bookhub.BorrowingFragment;
 import com.example.bookhub.HistoryFragment;
 import com.example.bookhub.ReservationsFragment;
@@ -35,5 +37,6 @@ public class BorrowPagerAdapter extends FragmentStateAdapter {
     public int getItemCount() {
         return 3;
     }
+
 
 }

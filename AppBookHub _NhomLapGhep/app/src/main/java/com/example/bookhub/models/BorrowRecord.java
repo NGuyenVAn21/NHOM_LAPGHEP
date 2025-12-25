@@ -3,7 +3,7 @@ package com.example.bookhub.models;
 import com.google.gson.annotations.SerializedName;
 
 public class BorrowRecord {
-
+    // Phải dùng @SerializedName để map đúng với JSON từ API C#
     @SerializedName("recordId")
     private int recordId;
 
@@ -16,7 +16,6 @@ public class BorrowRecord {
     @SerializedName("author")
     private String author;
 
-    // API C# trả về: "coverUrl": "http://..."
     @SerializedName("coverUrl")
     private String coverUrl;
 
@@ -38,16 +37,14 @@ public class BorrowRecord {
     @SerializedName("statusColor")
     private String statusColor;
 
-    // --- GETTERS ---
+    // Getters
     public int getRecordId() { return recordId; }
     public int getBookId() { return bookId; }
     public String getTitle() { return title; }
-    public String getAuthor() { return author; }
     public String getCoverUrl() { return coverUrl; }
     public String getBorrowDate() { return borrowDate; }
     public String getDueDate() { return dueDate; }
     public String getReturnDate() { return returnDate; }
-    public String getStatus() { return status; }
     public String getDisplayStatus() { return displayStatus; }
     public String getStatusColor() { return statusColor; }
 }

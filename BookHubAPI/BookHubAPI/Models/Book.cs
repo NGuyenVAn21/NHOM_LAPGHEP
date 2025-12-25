@@ -33,9 +33,9 @@ namespace BookHubAPI.Models
 
         [Column("price")]
         public decimal Price { get; set; } = 0;
-
-        [Column("cover_image_url")]
+        [Column("image_file")]  // ✅ Đổi từ cover_image_url sang image_file
         public string? CoverImageUrl { get; set; }
+
 
         [Column("category_id")]
         public int? CategoryId { get; set; }

@@ -38,7 +38,6 @@ namespace BookHubAPI.Controllers
         [HttpGet("{id}")]
         public IActionResult GetBookById(int id)
         {
-            var books = new List<object>();
             try
             {
                 using (SqlConnection conn = new SqlConnection(GetConnectionString()))
@@ -90,14 +89,14 @@ namespace BookHubAPI.Controllers
             return ExecuteQuery(@"
                 SELECT TOP 6 b.book_id, b.title, b.author, b.average_rating, b.page_count, 
                        b.current_status, b.price, b.review_count, b.description, 
-                       b.image_file, c.category_name,
+                       b.cover_image_url, c.category_name,
                        COUNT(br.record_id) as borrow_count
                 FROM Books b
                 LEFT JOIN Categories c ON b.category_id = c.category_id
                 LEFT JOIN BorrowRecords br ON b.book_id = br.book_id
                 GROUP BY b.book_id, b.title, b.author, b.average_rating, b.page_count, 
                          b.current_status, b.price, b.review_count, b.description, 
-                         b.image_file, c.category_name
+                         b.cover_image_url, c.category_name
                 ORDER BY borrow_count DESC
             ");
         }
@@ -113,7 +112,7 @@ namespace BookHubAPI.Controllers
                     conn.Open();
                     string sql = @"
                         INSERT INTO Books (title, author, publisher, published_year, page_count, 
-                                         description, price, image_file, category_id, stock_quantity, current_status)
+                                         description, price, cover_image_url, category_id, stock_quantity, current_status)
                         VALUES (@title, @author, @publisher, @year, @pages, 
                                 @desc, @price, @img, @catId, @stock, @status);
                         SELECT CAST(SCOPE_IDENTITY() as int);
@@ -173,7 +172,7 @@ namespace BookHubAPI.Controllers
                             page_count = @pages,
                             description = @desc, 
                             price = @price, 
-                            image_file = @img, 
+                            cover_image_url = @img, 
                             category_id = @catId, 
                             stock_quantity = @stock,
                             current_status = @status
@@ -282,7 +281,41 @@ namespace BookHubAPI.Controllers
 
         private object CreateBookObject(SqlDataReader reader)
         {
-            string fileName = reader["image_file"] != DBNull.Value ? reader["image_file"].ToString() : "";
+            // ✅ FIX: Thử cả 2 tên cột để tương thích
+            string imageColumnName = "cover_image_url";
+
+            // Kiểm tra xem column nào tồn tại
+            bool hasImageFile = false;
+            bool hasCoverImageUrl = false;
+
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                string columnName = reader.GetName(i);
+                if (columnName == "image_file") hasImageFile = true;
+                if (columnName == "cover_image_url") hasCoverImageUrl = true;
+            }
+
+            // Ưu tiên cover_image_url, fallback về image_file
+            if (hasCoverImageUrl)
+            {
+                imageColumnName = "cover_image_url";
+            }
+            else if (hasImageFile)
+            {
+                imageColumnName = "image_file";
+            }
+
+            string fileName = "";
+            try
+            {
+                fileName = reader[imageColumnName] != DBNull.Value ? reader[imageColumnName].ToString() : "";
+            }
+            catch
+            {
+                // Nếu cả 2 đều không có, để trống
+                fileName = "";
+            }
+
             string fullImageUrl = "";
             if (!string.IsNullOrEmpty(fileName))
             {
@@ -299,7 +332,7 @@ namespace BookHubAPI.Controllers
                 author = reader["author"].ToString(),
                 publisher = reader["publisher"] != DBNull.Value ? reader["publisher"].ToString() : null,
                 publishedYear = reader["published_year"] != DBNull.Value ? Convert.ToInt32(reader["published_year"]) : (int?)null,
-                rating = reader["average_rating"] != DBNull.Value ? Convert.ToSingle(reader["average_rating"]) : 0f,
+                rating = reader["average_rating"] != DBNull.Value ? Convert.ToDouble(reader["average_rating"]) : 0.0,
                 pages = reader["page_count"] != DBNull.Value ? Convert.ToInt32(reader["page_count"]) : 0,
                 status = reader["current_status"].ToString(),
                 stock = reader["stock_quantity"] != DBNull.Value ? Convert.ToInt32(reader["stock_quantity"]) : 0,

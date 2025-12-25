@@ -1,147 +1,245 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using System;
+﻿using BookHubAPI.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookHubAPI.Controllers
 {
-    [Route("api/events")]
+    [Route("api/[controller]")]
     [ApiController]
     public class EventsController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
+        private readonly AppDbContext _context;
 
-        public EventsController(IConfiguration configuration)
+        public EventsController(AppDbContext context)
         {
-            _configuration = configuration;
+            _context = context;
         }
 
-        // 1. API LẤY DANH SÁCH (Giữ nguyên logic cũ của bạn)
+        // ==================== SHARED ENDPOINTS ====================
+
+        // GET: api/events (Admin & Mobile - Lấy tất cả sự kiện)
         [HttpGet]
-        public IActionResult GetAllEvents()
+        public async Task<ActionResult<IEnumerable<object>>> GetEvents([FromQuery] bool? mobileFormat = false)
         {
-            var events = new List<object>();
-            try
+            var query = _context.Events.AsQueryable();
+
+            if (mobileFormat == true)
             {
-                string connectionString = _configuration.GetConnectionString("DefaultConnection");
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-                    string sql = "SELECT event_id, title, description, start_date, end_date, image_banner_url FROM Events WHERE is_active = 1";
-
-                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                // Format cho Mobile App
+                var mobileEvents = await query
+                    .Where(e => e.IsActive)
+                    .Select(e => new
                     {
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                // Xử lý link ảnh
-                                string fileName = reader["image_banner_url"] != DBNull.Value ? reader["image_banner_url"].ToString() : "";
-                                string fullUrl = "";
-                                if (!string.IsNullOrEmpty(fileName) && !fileName.StartsWith("http"))
-                                {
-                                    fullUrl = $"{Request.Scheme}://{Request.Host}/images/{fileName}";
-                                }
-                                else
-                                {
-                                    fullUrl = fileName;
-                                }
+                        id = e.EventId,
+                        title = e.Title,
+                        description = e.Description ?? "",
+                        startDate = e.StartDate != null ? e.StartDate.Value.ToString("dd/MM/yyyy") : "",
+                        endDate = e.EndDate != null ? e.EndDate.Value.ToString("dd/MM/yyyy") : "",
+                        imageUrl = GetFullImageUrl(e.ImageBannerUrl)
+                    })
+                    .ToListAsync();
 
-                                events.Add(new
-                                {
-                                    id = Convert.ToInt32(reader["event_id"]), // QUAN TRỌNG: Trả về ID
-                                    title = reader["title"].ToString(),
-                                    description = reader["description"].ToString(),
-                                    startDate = Convert.ToDateTime(reader["start_date"]).ToString("dd/MM/yyyy"),
-                                    endDate = Convert.ToDateTime(reader["end_date"]).ToString("dd/MM/yyyy"),
-                                    imageUrl = fullUrl
-                                });
-                            }
-                        }
-                    }
-                }
+                return Ok(mobileEvents);
+            }
+            else
+            {
+                // Format cho Admin Panel
+                var events = await query
+                    .Select(e => new
+                    {
+                        eventId = e.EventId,
+                        title = e.Title,
+                        description = e.Description,
+                        startDate = e.StartDate,
+                        endDate = e.EndDate,
+                        imageBannerUrl = GetFullImageUrl(e.ImageBannerUrl),
+                        isActive = e.IsActive
+                    })
+                    .ToListAsync();
+
                 return Ok(events);
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Lỗi Server: " + ex.Message);
-            }
         }
 
-        // 2. API ĐĂNG KÝ (Thêm mới đoạn này)
+        // GET: api/events/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Event>> GetEvent(int id)
+        {
+            var @event = await _context.Events.FindAsync(id);
+            if (@event == null)
+                return NotFound();
+
+            return Ok(@event);
+        }
+
+        // ==================== MOBILE APP ENDPOINTS ====================
+
+        // POST: api/events/register (Mobile - Đăng ký sự kiện)
         [HttpPost("register")]
-        public IActionResult RegisterEvent([FromBody] RegistrationRequest req)
+        public async Task<ActionResult> RegisterEvent([FromBody] RegistrationRequest req)
         {
-            try
-            {
-                string connectionString = _configuration.GetConnectionString("DefaultConnection");
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
+            // Kiểm tra đã đăng ký chưa
+            var existing = await _context.EventRegistrations
+                .FirstOrDefaultAsync(er => er.UserId == req.UserId && er.EventId == req.EventId);
 
-                    // Kiểm tra xem đã đăng ký chưa
-                    string checkSql = "SELECT COUNT(*) FROM EventRegistrations WHERE user_id = @uid AND event_id = @eid";
-                    using (SqlCommand checkCmd = new SqlCommand(checkSql, conn))
-                    {
-                        checkCmd.Parameters.AddWithValue("@uid", req.UserId);
-                        checkCmd.Parameters.AddWithValue("@eid", req.EventId);
-                        int count = (int)checkCmd.ExecuteScalar();
-                        if (count > 0) return BadRequest(new { message = "Bạn đã đăng ký sự kiện này rồi!" });
-                    }
+            if (existing != null)
+                return BadRequest(new { message = "Bạn đã đăng ký sự kiện này rồi!" });
 
-                    // Nếu chưa thì Insert
-                    string sql = "INSERT INTO EventRegistrations (user_id, event_id, status) VALUES (@uid, @eid, N'Đã đăng ký')";
-                    using (SqlCommand cmd = new SqlCommand(sql, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@uid", req.UserId);
-                        cmd.Parameters.AddWithValue("@eid", req.EventId);
-                        cmd.ExecuteNonQuery();
-                    }
-                }
-                return Ok(new { message = "Đăng ký thành công!" });
-            }
-            catch (Exception ex)
+            // Tạo đăng ký mới
+            var registration = new EventRegistration
             {
-                return StatusCode(500, new { message = "Lỗi Server: " + ex.Message });
-            }
+                UserId = req.UserId,
+                EventId = req.EventId,
+                Status = "Đã đăng ký",
+                RegisteredAt = DateTime.Now
+            };
+
+            _context.EventRegistrations.Add(registration);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Đăng ký thành công!" });
         }
-        // ... (Các hàm cũ giữ nguyên) ...
 
-        // 3. API KIỂM TRA TRẠNG THÁI ĐĂNG KÝ
+        // GET: api/events/check-status?userId=1&eventId=1 (Mobile - Kiểm tra đã đăng ký chưa)
         [HttpGet("check-status")]
-        public IActionResult CheckRegistration(int userId, int eventId)
+        public async Task<ActionResult> CheckRegistration([FromQuery] int userId, [FromQuery] int eventId)
         {
-            try
-            {
-                string connectionString = _configuration.GetConnectionString("DefaultConnection");
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-                    string sql = "SELECT COUNT(*) FROM EventRegistrations WHERE user_id = @uid AND event_id = @eid";
-                    using (SqlCommand cmd = new SqlCommand(sql, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@uid", userId);
-                        cmd.Parameters.AddWithValue("@eid", eventId);
-                        int count = (int)cmd.ExecuteScalar();
+            var isRegistered = await _context.EventRegistrations
+                .AnyAsync(er => er.UserId == userId && er.EventId == eventId);
 
-                        // Trả về true nếu count > 0 (đã đăng ký)
-                        return Ok(new { isRegistered = count > 0 });
-                    }
-                }
-            }
-            catch (Exception ex)
+            return Ok(new { isRegistered });
+        }
+
+        // GET: api/events/my-registrations?userId=1 (Mobile - Danh sách sự kiện đã đăng ký)
+        [HttpGet("my-registrations")]
+        public async Task<ActionResult> GetMyRegistrations([FromQuery] int userId)
+        {
+            var registrations = await _context.EventRegistrations
+                .Include(er => er.Event)
+                .Where(er => er.UserId == userId)
+                .Select(er => new
+                {
+                    registrationId = er.RegistrationId,
+                    eventId = er.EventId,
+                    title = er.Event!.Title,
+                    description = er.Event.Description ?? "",
+                    startDate = er.Event.StartDate != null ? er.Event.StartDate.Value.ToString("dd/MM/yyyy") : "",
+                    endDate = er.Event.EndDate != null ? er.Event.EndDate.Value.ToString("dd/MM/yyyy") : "",
+                    imageUrl = GetFullImageUrl(er.Event.ImageBannerUrl),
+                    status = er.Status,
+                    registeredAt = er.RegisteredAt.ToString("dd/MM/yyyy")
+                })
+                .ToListAsync();
+
+            return Ok(registrations);
+        }
+
+        // ==================== ADMIN ENDPOINTS ====================
+
+        // POST: api/events (Admin - Tạo sự kiện mới)
+        [HttpPost]
+        public async Task<ActionResult> CreateEvent([FromBody] CreateEventRequest request)
+        {
+            var @event = new Event
             {
-                return StatusCode(500, new { message = "Lỗi: " + ex.Message });
-            }
+                Title = request.Title,
+                Description = request.Description,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate,
+                ImageBannerUrl = request.ImageBannerUrl,
+                IsActive = request.IsActive
+            };
+
+            _context.Events.Add(@event);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetEvent), new { id = @event.EventId }, @event);
+        }
+
+        // PUT: api/events/5 (Admin - Cập nhật sự kiện)
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateEvent(int id, [FromBody] CreateEventRequest request)
+        {
+            var @event = await _context.Events.FindAsync(id);
+            if (@event == null)
+                return NotFound();
+
+            @event.Title = request.Title;
+            @event.Description = request.Description;
+            @event.StartDate = request.StartDate;
+            @event.EndDate = request.EndDate;
+            @event.ImageBannerUrl = request.ImageBannerUrl;
+            @event.IsActive = request.IsActive;
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        // DELETE: api/events/5 (Admin - Xóa sự kiện)
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteEvent(int id)
+        {
+            var @event = await _context.Events.FindAsync(id);
+            if (@event == null)
+                return NotFound();
+
+            _context.Events.Remove(@event);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        // GET: api/events/5/registrations (Admin - Xem danh sách đăng ký của 1 sự kiện)
+        [HttpGet("{id}/registrations")]
+        public async Task<ActionResult> GetEventRegistrations(int id)
+        {
+            var registrations = await _context.EventRegistrations
+                .Include(er => er.User)
+                .Where(er => er.EventId == id)
+                .Select(er => new
+                {
+                    registrationId = er.RegistrationId,
+                    userId = er.UserId,
+                    fullName = er.User!.FullName,
+                    username = er.User.Username,
+                    email = er.User.Email,
+                    status = er.Status,
+                    registeredAt = er.RegisteredAt.ToString("dd/MM/yyyy HH:mm")
+                })
+                .ToListAsync();
+
+            return Ok(registrations);
+        }
+
+        // ==================== HELPER METHODS ====================
+
+        private string GetFullImageUrl(string? fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return "";
+
+            if (fileName.StartsWith("http"))
+                return fileName;
+
+            return $"{Request.Scheme}://{Request.Host}/images/{fileName}";
         }
     }
 
-    // Class hứng dữ liệu
+    // ==================== DTOs ====================
+
+    public class CreateEventRequest
+    {
+        public string Title { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string? ImageBannerUrl { get; set; }
+        public bool IsActive { get; set; } = true;
+    }
+
     public class RegistrationRequest
     {
         public int UserId { get; set; }
         public int EventId { get; set; }
     }
-
 }

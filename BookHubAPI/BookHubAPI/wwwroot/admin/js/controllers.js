@@ -1,5 +1,5 @@
 ﻿// wwwroot/admin/js/controllers.js
-// ✅ Tất cả controllers trong 1 file
+// ✅ Controllers đã fix để khớp với API backend
 
 // ==================== DASHBOARD CONTROLLER ====================
 window.dashboardInit = async () => {
@@ -18,16 +18,17 @@ window.dashboardInit = async () => {
         document.getElementById('borrowingCount').textContent = borrowings.length;
         document.getElementById('eventCount').textContent = events.length;
 
-        // Chart 1: Top Books
+        // Chart 1: Top Books (Lấy từ API popular)
+        const popularBooks = await window.api.get('/books/popular');
         const topBooksCtx = document.getElementById('topBooksChart');
-        if (topBooksCtx) {
+        if (topBooksCtx && popularBooks.length > 0) {
             new Chart(topBooksCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['Nhà Giả Kim', 'Đắc Nhân Tâm', 'Sapiens', 'Tư Duy Phản Biện', 'Atomic Habits'],
+                    labels: popularBooks.slice(0, 5).map(b => b.title),
                     datasets: [{
                         label: 'Số lượt mượn',
-                        data: [45, 38, 32, 28, 25],
+                        data: popularBooks.slice(0, 5).map(b => b.borrow_count || 0),
                         backgroundColor: '#4e73df'
                     }]
                 },
@@ -148,7 +149,7 @@ window.booksInit = async () => {
         new bootstrap.Modal(document.getElementById('bookModal')).show();
     };
 
-    window.editBook = function (id) {
+    window.editBook = async function (id) {
         const book = books.find(b => b.id == id);
         if (!book) return;
 
@@ -157,7 +158,11 @@ window.booksInit = async () => {
         document.getElementById('title').value = book.title;
         document.getElementById('author').value = book.author;
         document.getElementById('categoryId').value = book.categoryId || '';
-        document.getElementById('price').value = book.price || 0;
+
+        // ✅ Fix: Parse price (loại bỏ " VND" và dấu phẩy)
+        const priceNum = book.price ? parseFloat(book.price.replace(/[^\d]/g, '')) : 0;
+        document.getElementById('price').value = priceNum;
+
         document.getElementById('description').value = book.description || '';
         document.getElementById('stockQuantity').value = book.stock || 1;
         document.getElementById('coverImageUrl').value = book.coverImageUrl || '';
@@ -307,9 +312,7 @@ async function loadBorrowings(status) {
         document.querySelectorAll('.btn-group button').forEach(btn => {
             btn.classList.remove('active');
         });
-        if (event?.target) {
-            event.target.classList.add('active');
-        }
+        event?.target?.classList.add('active');
 
         const tbody = document.getElementById('borrowingTable');
 
@@ -349,7 +352,7 @@ async function loadBorrowings(status) {
                             <button class="btn btn-sm btn-success me-1" onclick="returnBook(${b.recordId})">
                                 <i class="fas fa-check me-1"></i> Trả
                             </button>
-                            <button class="btn btn-sm btn-info" disabled>
+                            <button class="btn btn-sm btn-info" onclick="extendBook(${b.recordId})">
                                 <i class="fas fa-clock"></i> Gia hạn
                             </button>
                         ` : `
@@ -389,6 +392,19 @@ window.returnBook = async function (id) {
         alert('✅ Trả sách thành công!');
     } catch (err) {
         console.error('❌ Lỗi trả sách:', err);
+        alert('❌ Lỗi: ' + err.message);
+    }
+};
+
+window.extendBook = async function (id) {
+    if (!confirm('Gia hạn thêm 7 ngày?')) return;
+
+    try {
+        await window.api.put(`/borrowings/${id}/extend`, { days: 7 });
+        loadBorrowings('Borrowing');
+        alert('✅ Gia hạn thành công!');
+    } catch (err) {
+        console.error('❌ Lỗi gia hạn:', err);
         alert('❌ Lỗi: ' + err.message);
     }
 };

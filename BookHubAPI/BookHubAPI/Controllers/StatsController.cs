@@ -1,103 +1,180 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
-using System;
+﻿using BookHubAPI.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookHubAPI.Controllers
 {
-    [Route("api/stats")]
+    [Route("api/[controller]")]
     [ApiController]
     public class StatsController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
-        public StatsController(IConfiguration configuration) { _configuration = configuration; }
+        private readonly AppDbContext _context;
 
-        [HttpGet("active-readers")]
-        public IActionResult GetActiveReaders()
+        public StatsController(AppDbContext context)
         {
-            var users = new List<object>();
-            try
-            {
-                string connectionString = _configuration.GetConnectionString("DefaultConnection");
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-                    // Query: Đếm số sách đã mượn (kể cả đã trả) và xếp giảm dần
-                    string sql = @"
-                        SELECT TOP 5 u.user_id, u.full_name, u.avatar_url, COUNT(br.record_id) as total_borrow
-                        FROM Users u
-                        JOIN BorrowRecords br ON u.user_id = br.user_id
-                        GROUP BY u.user_id, u.full_name, u.avatar_url
-                        ORDER BY total_borrow DESC";
-
-                    using (SqlCommand cmd = new SqlCommand(sql, conn))
-                    {
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                // Xử lý ảnh avatar
-                                string fileName = reader["avatar_url"] != DBNull.Value ? reader["avatar_url"].ToString() : "";
-                                string fullUrl = "";
-                                if (!string.IsNullOrEmpty(fileName) && !fileName.StartsWith("http"))
-                                {
-                                    fullUrl = $"{Request.Scheme}://{Request.Host}/images/{fileName}";
-                                }
-                                else fullUrl = fileName;
-
-                                users.Add(new
-                                {
-                                    id = Convert.ToInt32(reader["user_id"]),
-                                    name = reader["full_name"].ToString(),
-                                    avatar = fullUrl,
-                                    borrowCount = Convert.ToInt32(reader["total_borrow"])
-                                });
-                            }
-                        }
-                    }
-                }
-                return Ok(users);
-            }
-            catch (Exception ex) { return StatusCode(500, "Lỗi: " + ex.Message); }
+            _context = context;
         }
-        // Trong class StatsController:
 
-        [HttpGet("user-summary")]
-        public IActionResult GetUserSummary(int userId)
+        // GET: api/stats/active-readers (Mobile - Top 5 độc giả tích cực)
+        [HttpGet("active-readers")]
+        public async Task<ActionResult> GetActiveReaders()
         {
-            try
-            {
-                string connectionString = _configuration.GetConnectionString("DefaultConnection");
-                using (SqlConnection conn = new SqlConnection(connectionString))
+            var users = await _context.Users
+                .Select(u => new
                 {
-                    conn.Open();
+                    User = u,
+                    TotalBorrow = _context.BorrowRecords.Count(br => br.UserId == u.UserId)
+                })
+                .OrderByDescending(x => x.TotalBorrow)
+                .Take(5)
+                .Select(x => new
+                {
+                    id = x.User.UserId,
+                    name = x.User.FullName,
+                    avatar = GetFullImageUrl(x.User.AvatarUrl),
+                    borrowCount = x.TotalBorrow
+                })
+                .ToListAsync();
 
-                    // 1. Đếm sách ĐANG MƯỢN
-                    string sqlBorrow = "SELECT COUNT(*) FROM BorrowRecords WHERE user_id = @uid AND status = 'Borrowing'";
-                    SqlCommand cmdBorrow = new SqlCommand(sqlBorrow, conn);
-                    cmdBorrow.Parameters.AddWithValue("@uid", userId);
-                    int borrowCount = (int)cmdBorrow.ExecuteScalar();
+            return Ok(users);
+        }
 
-                    // 2. Đếm sách SẮP ĐẾN HẠN (Ví dụ: Còn 3 ngày nữa hết hạn)
-                    // Logic: Đang mượn VÀ DueDate <= Ngày hiện tại + 3 ngày
-                    string sqlDue = @"SELECT COUNT(*) FROM BorrowRecords 
-                              WHERE user_id = @uid 
-                              AND status = 'Borrowing' 
-                              AND due_date <= DATEADD(day, 3, GETDATE())";
+        // GET: api/stats/user-summary?userId=1 (Mobile - Thống kê của 1 user)
+        [HttpGet("user-summary")]
+        public async Task<ActionResult> GetUserSummary([FromQuery] int userId)
+        {
+            // 1. Đếm sách đang mượn
+            var borrowCount = await _context.BorrowRecords
+                .CountAsync(br => br.UserId == userId && br.Status == "Borrowing");
 
-                    SqlCommand cmdDue = new SqlCommand(sqlDue, conn);
-                    cmdDue.Parameters.AddWithValue("@uid", userId);
-                    int dueSoonCount = (int)cmdDue.ExecuteScalar();
+            // 2. Đếm sách sắp đến hạn (còn 3 ngày)
+            var dueSoonCount = await _context.BorrowRecords
+                .CountAsync(br => br.UserId == userId &&
+                                 br.Status == "Borrowing" &&
+                                 br.DueDate <= DateTime.Now.AddDays(3));
 
-                    return Ok(new
+            return Ok(new
+            {
+                borrowing = borrowCount,
+                dueSoon = dueSoonCount
+            });
+        }
+
+        // ==================== THỐNG KÊ CHO ADMIN ====================
+
+        // GET: api/stats/dashboard (Admin - Thống kê tổng quan)
+        [HttpGet("dashboard")]
+        public async Task<ActionResult> GetDashboardStats()
+        {
+            var totalBooks = await _context.Books.CountAsync();
+            var totalUsers = await _context.Users.CountAsync();
+            var borrowingCount = await _context.BorrowRecords.CountAsync(b => b.Status == "Borrowing");
+            var overdueCount = await _context.BorrowRecords.CountAsync(b => b.Status == "Overdue");
+            var activeEvents = await _context.Events.CountAsync(e => e.IsActive);
+
+            // Top 5 sách được mượn nhiều nhất
+            var topBooks = await _context.BorrowRecords
+                .GroupBy(br => br.BookId)
+                .Select(g => new
+                {
+                    BookId = g.Key,
+                    BorrowCount = g.Count()
+                })
+                .OrderByDescending(x => x.BorrowCount)
+                .Take(5)
+                .Join(_context.Books,
+                    x => x.BookId,
+                    b => b.BookId,
+                    (x, b) => new
                     {
-                        borrowing = borrowCount,
-                        dueSoon = dueSoonCount
-                    });
-                }
-            }
-            catch (Exception ex) { return StatusCode(500, "Lỗi: " + ex.Message); }
+                        bookId = b.BookId,
+                        title = b.Title,
+                        author = b.Author,
+                        borrowCount = x.BorrowCount
+                    })
+                .ToListAsync();
+
+            return Ok(new
+            {
+                totalBooks,
+                totalUsers,
+                borrowingCount,
+                overdueCount,
+                activeEvents,
+                topBooks
+            });
+        }
+
+        // GET: api/stats/book-status (Admin - Thống kê trạng thái sách)
+        [HttpGet("book-status")]
+        public async Task<ActionResult> GetBookStatus()
+        {
+            var available = await _context.Books.CountAsync(b => b.StockQuantity > 0);
+            var outOfStock = await _context.Books.CountAsync(b => b.StockQuantity == 0);
+
+            return Ok(new
+            {
+                available,
+                outOfStock
+            });
+        }
+
+        // GET: api/stats/monthly-borrows (Admin - Thống kê mượn theo tháng)
+        [HttpGet("monthly-borrows")]
+        public async Task<ActionResult> GetMonthlyBorrows([FromQuery] int year = 0)
+        {
+            if (year == 0) year = DateTime.Now.Year;
+
+            var monthlyData = await _context.BorrowRecords
+                .Where(br => br.BorrowDate.Year == year)
+                .GroupBy(br => br.BorrowDate.Month)
+                .Select(g => new
+                {
+                    month = g.Key,
+                    count = g.Count()
+                })
+                .OrderBy(x => x.month)
+                .ToListAsync();
+
+            // Tạo data cho 12 tháng (fill 0 nếu không có)
+            var result = Enumerable.Range(1, 12).Select(month => new
+            {
+                month = $"Tháng {month}",
+                count = monthlyData.FirstOrDefault(x => x.month == month)?.count ?? 0
+            });
+
+            return Ok(result);
+        }
+
+        // GET: api/stats/category-distribution (Admin - Phân bố sách theo danh mục)
+        [HttpGet("category-distribution")]
+        public async Task<ActionResult> GetCategoryDistribution()
+        {
+            var distribution = await _context.Books
+                .Include(b => b.Category)
+                .GroupBy(b => b.Category!.CategoryName)
+                .Select(g => new
+                {
+                    category = g.Key,
+                    count = g.Count()
+                })
+                .OrderByDescending(x => x.count)
+                .ToListAsync();
+
+            return Ok(distribution);
+        }
+
+        // ==================== HELPER METHODS ====================
+
+        private string GetFullImageUrl(string? fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return "";
+
+            if (fileName.StartsWith("http"))
+                return fileName;
+
+            return $"{Request.Scheme}://{Request.Host}/images/{fileName}";
         }
     }
 }

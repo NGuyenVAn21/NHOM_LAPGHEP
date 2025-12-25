@@ -11,6 +11,7 @@ namespace BookHubAPI.Models
         public DbSet<Category> Categories { get; set; }
         public DbSet<BorrowRecord> BorrowRecords { get; set; }
         public DbSet<Event> Events { get; set; }
+        public DbSet<EventRegistration> EventRegistrations { get; set; } // ✅ THÊM DÒNG NÀY
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,6 +29,17 @@ namespace BookHubAPI.Models
                 .HasOne(b => b.Book)
                 .WithMany()
                 .HasForeignKey(b => b.BookId);
+
+            // ✅ THÊM RELATIONSHIP CHO EventRegistration
+            modelBuilder.Entity<EventRegistration>()
+                .HasOne(er => er.User)
+                .WithMany()
+                .HasForeignKey(er => er.UserId);
+
+            modelBuilder.Entity<EventRegistration>()
+                .HasOne(er => er.Event)
+                .WithMany()
+                .HasForeignKey(er => er.EventId);
         }
     }
 }

@@ -3,8 +3,12 @@ package com.example.bookhub.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,6 +36,8 @@ public class HomeActivity extends AppCompatActivity {
     private TextView tvBorrowCount, tvDueSoonCount;
     private int currentUserId;
     private TextView tvUsername;
+    private EditText etSearch;
+    private LinearLayout btnBorrow, btnReturn, btnRead;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +53,10 @@ public class HomeActivity extends AppCompatActivity {
         tvBorrowCount = findViewById(R.id.tv_borrowing_count);
         tvDueSoonCount = findViewById(R.id.tv_due_soon_count);
         tvUsername = findViewById(R.id.tv_home_username);
+        etSearch = findViewById(R.id.et_search_home);
+        btnBorrow = findViewById(R.id.btn_feature_borrow);
+        btnReturn = findViewById(R.id.btn_feature_return);
+        btnRead = findViewById(R.id.btn_feature_read);
 
         currentUserId = getSharedPreferences("BookHubPrefs", MODE_PRIVATE)
                 .getInt("CURRENT_USER_ID", -1);
@@ -66,6 +76,44 @@ public class HomeActivity extends AppCompatActivity {
         if (tvUsername != null) {
             tvUsername.setText("Xin chào, " + fullName + "!");
         }
+
+
+        //XỬ LÝ TÌM KIẾM (Khi bấm Enter trên bàn phím)
+        etSearch.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+
+                String query = etSearch.getText().toString().trim();
+                if (!query.isEmpty()) {
+                    // Chuyển sang màn hình BookSearchActivity và gửi từ khóa
+                    Intent intent = new Intent(HomeActivity.this, BookSearchActivity.class);
+                    intent.putExtra("SEARCH_QUERY", query); // Gửi từ khóa sang kia
+                    startActivity(intent);
+                }
+                return true;
+            }
+            return false;
+        });
+
+        // 3. XỬ LÝ CLICK CÁC NÚT TÍNH NĂNG
+
+        // Nút Mượn sách -> Chuyển sang trang Tìm kiếm (để tìm sách mượn)
+        btnBorrow.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, BookSearchActivity.class);
+            startActivity(intent);
+        });
+
+        // Nút Lịch sử/Trả sách -> Chuyển sang trang Lịch sử mượn
+        btnReturn.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, BorrowHistoryActivity.class);
+            startActivity(intent);
+        });
+
+        btnRead.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, BookSearchActivity.class);
+            startActivity(intent);
+        });
+
         // 3. Gọi API lấy sách
         fetchNewBooks();
         fetchPopularBooks();

@@ -74,9 +74,10 @@
                 android:paddingBottom="40dp">
 
                 <TextView
+                    android:id="@+id/tv_home_username"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Xin chào, Nguyễn Văn A!"
+                    android:text="Xin chào, User!"
                     android:textColor="@color/white"
                     android:textSize="24sp"
                     android:textStyle="bold"
@@ -147,9 +148,10 @@
                         android:padding="20dp"
                         android:gravity="center">
                         <TextView
+                            android:id="@+id/tv_borrowing_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="7"
+                            android:text="0"
                             android:textSize="32sp"
                             android:textStyle="bold"
                             android:textColor="@color/primary_color"
@@ -179,9 +181,10 @@
                         android:padding="20dp"
                         android:gravity="center">
                         <TextView
+                            android:id="@+id/tv_due_soon_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="3"
+                            android:text="0"
                             android:textSize="32sp"
                             android:textStyle="bold"
                             android:textColor="@color/secondary_color"

@@ -6,6 +6,7 @@ import com.example.bookhub.models.RegisterResponse;
 import com.example.bookhub.models.RegistrationRequest;
 import com.example.bookhub.models.CheckStatusResponse;
 import com.example.bookhub.models.UserRank;
+import com.example.bookhub.models.UserStatsResponse;
 
 import java.util.List;
 import okhttp3.ResponseBody;
@@ -13,6 +14,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 public interface ApiService {
 
@@ -41,4 +43,13 @@ public interface ApiService {
 
     @GET("api/stats/active-readers")
     Call<List<UserRank>> getActiveReaders();
+
+    @GET("api/books/new")
+    Call<List<Book>> getNewBooks();
+
+    @GET("api/books/popular")
+    Call<List<Book>> getPopularBooks();
+
+    @GET("api/stats/user-summary")
+    Call<UserStatsResponse> getUserStats(@Query("userId") int userId);
 }

@@ -1,9 +1,11 @@
 package com.example.bookhub.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,11 +23,15 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import com.example.bookhub.models.UserStatsResponse;
 
 public class HomeActivity extends AppCompatActivity {
     private RecyclerView recyclerActiveReaders;
     private RecyclerView recyclerNewBooks, recyclerPopularBooks;
     private BottomNavigationView bottomNavigationView;
+    private TextView tvBorrowCount, tvDueSoonCount;
+    private int currentUserId;
+    private TextView tvUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,16 +44,34 @@ public class HomeActivity extends AppCompatActivity {
         recyclerNewBooks = findViewById(R.id.recycler_new_books);
         recyclerPopularBooks = findViewById(R.id.recycler_popular_books); // Ánh xạ thêm cái này
         bottomNavigationView = findViewById(R.id.bottom_navigation_view);
+        tvBorrowCount = findViewById(R.id.tv_borrowing_count);
+        tvDueSoonCount = findViewById(R.id.tv_due_soon_count);
+        tvUsername = findViewById(R.id.tv_home_username);
+
+        currentUserId = getSharedPreferences("BookHubPrefs", MODE_PRIVATE)
+                .getInt("CURRENT_USER_ID", -1);
+        if (currentUserId == -1) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return; // Dừng code tại đây
+        }
 
         // 2. Cài đặt RecyclerView nằm NGANG (Horizontal)
         recyclerNewBooks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         recyclerPopularBooks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         recyclerActiveReaders.setNestedScrollingEnabled(false);
 
+        SharedPreferences prefs = getSharedPreferences("BookHubPrefs", MODE_PRIVATE);
+        String fullName = prefs.getString("CURRENT_USER_NAME", "Bạn");
+        if (tvUsername != null) {
+            tvUsername.setText("Xin chào, " + fullName + "!");
+        }
         // 3. Gọi API lấy sách
-        fetchBooks();
+        fetchNewBooks();
+        fetchPopularBooks();
         fetchEvents();
         fetchActiveReaders();
+        fetchUserStats();
 
         // 4. Cài đặt Footer (Bottom Navigation)
         setupBottomNavigation();
@@ -59,29 +83,56 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    // Trong HomeActivity.java
-
-    private void fetchBooks() {
-        RetrofitClient.getApiService().getAllBooks().enqueue(new Callback<List<Book>>() {
+    private void fetchUserStats() {
+        RetrofitClient.getApiService().getUserStats(currentUserId).enqueue(new Callback<UserStatsResponse>() {
             @Override
-            public void onResponse(Call<List<Book>> call, Response<List<Book>> response) {
+            public void onResponse(Call<UserStatsResponse> call, Response<UserStatsResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<Book> bookList = response.body();
-
-                    // --- Adapter cho Sách Mới ---
-                    HomeAdapter adapterNew = new HomeAdapter(bookList, book -> openBookDetail(book));
-                    recyclerNewBooks.setAdapter(adapterNew);
-
-                    // --- Adapter cho Sách Phổ Biến (Tạm thời dùng chung list để hiển thị) ---
-                    // Trong thực tế bạn có thể đảo ngược list hoặc filter theo rating
-                    HomeAdapter adapterPopular = new HomeAdapter(bookList, book -> openBookDetail(book));
-                    recyclerPopularBooks.setAdapter(adapterPopular);
+                    // Cập nhật giao diện
+                    tvBorrowCount.setText(String.valueOf(response.body().getBorrowing()));
+                    tvDueSoonCount.setText(String.valueOf(response.body().getDueSoon()));
                 }
             }
 
             @Override
+            public void onFailure(Call<UserStatsResponse> call, Throwable t) {
+                // Lỗi thì để mặc định là 0 hoặc "-"
+                tvBorrowCount.setText("-");
+                tvDueSoonCount.setText("-");
+            }
+        });
+    }
+
+    private void fetchNewBooks() {
+        RetrofitClient.getApiService().getNewBooks().enqueue(new Callback<List<Book>>() {
+            @Override
+            public void onResponse(Call<List<Book>> call, Response<List<Book>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    // Dùng HomeAdapter đổ vào recyclerNewBooks
+                    HomeAdapter adapter = new HomeAdapter(response.body(), book -> openBookDetail(book));
+                    recyclerNewBooks.setAdapter(adapter);
+                }
+            }
+            @Override
             public void onFailure(Call<List<Book>> call, Throwable t) {
-                Toast.makeText(HomeActivity.this, "Lỗi API: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(HomeActivity.this, "Lỗi : " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchPopularBooks() {
+        RetrofitClient.getApiService().getPopularBooks().enqueue(new Callback<List<Book>>() {
+            @Override
+            public void onResponse(Call<List<Book>> call, Response<List<Book>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    // Dùng HomeAdapter đổ vào recyclerPopularBooks
+                    HomeAdapter adapter = new HomeAdapter(response.body(), book -> openBookDetail(book));
+                    recyclerPopularBooks.setAdapter(adapter);
+                }
+            }
+            @Override
+            public void onFailure(Call<List<Book>> call, Throwable t) {
+                Toast.makeText(HomeActivity.this, "Lỗi : " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -1,5 +1,4 @@
-﻿// Models/Book.cs
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookHubAPI.Models
@@ -47,8 +46,9 @@ namespace BookHubAPI.Models
         [Column("current_status")]
         public string CurrentStatus { get; set; } = "Có sẵn";
 
+        // ✅ FIX: Đổi từ float sang double để khớp với SQL Server FLOAT
         [Column("average_rating")]
-        public float AverageRating { get; set; } = 0;
+        public double AverageRating { get; set; } = 0;
 
         [Column("review_count")]
         public int ReviewCount { get; set; } = 0;
@@ -56,7 +56,6 @@ namespace BookHubAPI.Models
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        // Navigation property
         public Category? Category { get; set; }
     }
 }

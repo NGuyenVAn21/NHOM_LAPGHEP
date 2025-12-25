@@ -1,7 +1,4 @@
-﻿// Models/AppDbContext.cs
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Reflection.Emit;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace BookHubAPI.Models
 {
@@ -17,7 +14,6 @@ namespace BookHubAPI.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Cấu hình khóa ngoại
             modelBuilder.Entity<Book>()
                 .HasOne(b => b.Category)
                 .WithMany()

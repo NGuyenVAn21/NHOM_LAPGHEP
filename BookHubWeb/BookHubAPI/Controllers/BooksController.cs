@@ -1,5 +1,4 @@
-﻿// Controllers/BooksController.cs
-using BookHubAPI.Models;
+﻿using BookHubAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +15,7 @@ namespace BookHubAPI.Controllers
             _context = context;
         }
 
+        // GET: api/books
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks()
         {
@@ -26,18 +26,22 @@ namespace BookHubAPI.Controllers
                     Id = b.BookId,
                     Title = b.Title,
                     Author = b.Author,
-                    Category = b.Category.CategoryName ?? "Khác",
+                    Category = b.Category != null ? b.Category.CategoryName : "Khác",
+                    CategoryId = b.CategoryId,
                     Price = b.Price,
                     CoverImageUrl = b.CoverImageUrl,
                     Rating = b.AverageRating,
                     Reviews = b.ReviewCount,
-                    Status = b.CurrentStatus,
-                    Stock = b.StockQuantity
+                    Status = b.CurrentStatus ?? "Có sẵn",
+                    Stock = b.StockQuantity,
+                    Description = b.Description
                 })
                 .ToListAsync();
+
             return Ok(books);
         }
 
+        // GET: api/books/available
         [HttpGet("available")]
         public async Task<ActionResult<IEnumerable<BookDto>>> GetAvailableBooks()
         {
@@ -49,18 +53,21 @@ namespace BookHubAPI.Controllers
                     Id = b.BookId,
                     Title = b.Title,
                     Author = b.Author,
-                    Category = b.Category.CategoryName ?? "Khác",
+                    Category = b.Category != null ? b.Category.CategoryName : "Khác",
+                    CategoryId = b.CategoryId,
                     Price = b.Price,
                     CoverImageUrl = b.CoverImageUrl,
                     Rating = b.AverageRating,
                     Reviews = b.ReviewCount,
-                    Status = b.CurrentStatus,
+                    Status = b.CurrentStatus ?? "Có sẵn",
                     Stock = b.StockQuantity
                 })
                 .ToListAsync();
+
             return Ok(books);
         }
 
+        // GET: api/books/5
         [HttpGet("{id}")]
         public async Task<ActionResult<BookDetailDto>> GetBook(int id)
         {
@@ -83,13 +90,15 @@ namespace BookHubAPI.Controllers
                 Price = book.Price,
                 CoverImageUrl = book.CoverImageUrl,
                 Category = book.Category?.CategoryName ?? "Khác",
+                CategoryId = book.CategoryId,
                 Rating = book.AverageRating,
                 Reviews = book.ReviewCount,
                 Stock = book.StockQuantity,
-                Status = book.CurrentStatus
+                Status = book.CurrentStatus ?? "Có sẵn"
             });
         }
 
+        // POST: api/books
         [HttpPost]
         public async Task<ActionResult> CreateBook([FromBody] CreateBookRequest request)
         {
@@ -110,6 +119,40 @@ namespace BookHubAPI.Controllers
 
             return CreatedAtAction(nameof(GetBook), new { id = book.BookId }, book);
         }
+
+        // PUT: api/books/5
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateBook(int id, [FromBody] CreateBookRequest request)
+        {
+            var book = await _context.Books.FindAsync(id);
+            if (book == null)
+                return NotFound();
+
+            book.Title = request.Title;
+            book.Author = request.Author;
+            book.CategoryId = request.CategoryId;
+            book.Price = request.Price;
+            book.Description = request.Description;
+            book.StockQuantity = request.StockQuantity;
+            book.CurrentStatus = request.StockQuantity > 0 ? "Có sẵn" : "Hết hàng";
+            book.CoverImageUrl = request.CoverImageUrl;
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        // DELETE: api/books/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteBook(int id)
+        {
+            var book = await _context.Books.FindAsync(id);
+            if (book == null)
+                return NotFound();
+
+            _context.Books.Remove(book);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
     }
 
     // DTOs
@@ -119,12 +162,17 @@ namespace BookHubAPI.Controllers
         public string Title { get; set; } = string.Empty;
         public string Author { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
+        public int? CategoryId { get; set; }
         public decimal Price { get; set; }
         public string? CoverImageUrl { get; set; }
-        public float Rating { get; set; }
+
+        // ✅ FIX: Đổi từ float sang double
+        public double Rating { get; set; }
+
         public int Reviews { get; set; }
         public string Status { get; set; } = string.Empty;
         public int Stock { get; set; }
+        public string? Description { get; set; }
     }
 
     public class BookDetailDto
@@ -139,7 +187,11 @@ namespace BookHubAPI.Controllers
         public decimal Price { get; set; }
         public string? CoverImageUrl { get; set; }
         public string Category { get; set; } = string.Empty;
-        public float Rating { get; set; }
+        public int? CategoryId { get; set; }
+
+        // ✅ FIX: Đổi từ float sang double
+        public double Rating { get; set; }
+
         public int Reviews { get; set; }
         public int Stock { get; set; }
         public string Status { get; set; } = string.Empty;

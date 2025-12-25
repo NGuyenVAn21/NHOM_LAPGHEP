@@ -1,0 +1,36 @@
+﻿<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-primary">🔄 Quản lý Mượn & Trả</h2>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-outline-primary active" onclick="loadBorrowings('Borrowing')">
+            Đang mượn
+        </button>
+        <button type="button" class="btn btn-outline-success" onclick="loadBorrowings('Returned')">
+            Đã trả
+        </button>
+        <button type="button" class="btn btn-outline-danger" onclick="loadBorrowings('Overdue')">
+            Quá hạn
+        </button>
+    </div>
+</div>
+
+<div class="card shadow">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Người mượn</th>
+                        <th>Sách</th>
+                        <th>Ngày mượn</th>
+                        <th>Hạn trả</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody id="borrowingTable"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

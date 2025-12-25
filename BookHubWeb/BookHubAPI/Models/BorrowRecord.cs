@@ -28,7 +28,6 @@ namespace BookHubAPI.Models
         [Column("status")]
         public string Status { get; set; } = "Borrowing";
 
-        // Navigation
         public User? User { get; set; }
         public Book? Book { get; set; }
     }

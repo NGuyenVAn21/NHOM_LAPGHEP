@@ -52,23 +52,21 @@ namespace BookHubAPI.Controllers
                 using (SqlConnection conn = new SqlConnection(GetConnectionString()))
                 {
                     conn.Open();
-                    // Query kết hợp bảng BorrowRecords và Books
-                    // SỬA: Đổi 'b.cover_image_url' thành 'b.image_file' để khớp với database của bạn
+                    // 1. SỬA SQL: Thêm b.price vào SELECT
                     string sql = @"
                         SELECT br.record_id, br.borrow_date, br.due_date, br.return_date, br.status,
-                               b.book_id, b.title, b.author, b.image_file 
+                               b.book_id, b.title, b.author, b.image_file, b.price
                         FROM BorrowRecords br
                         JOIN Books b ON br.book_id = b.book_id
                         WHERE br.user_id = @uid AND br.status = @status
                         ORDER BY br.borrow_date DESC";
 
-                    // Nếu là tab Đang mượn (Borrowing), ta cần lấy cả những sách đã Quá hạn (Overdue)
                     if (status == "Borrowing")
                     {
-                        // SỬA: Đổi 'b.cover_image_url' thành 'b.image_file'
+                        // 1. SỬA SQL: Thêm b.price
                         sql = @"
                         SELECT br.record_id, br.borrow_date, br.due_date, br.return_date, br.status,
-                               b.book_id, b.title, b.author, b.image_file
+                               b.book_id, b.title, b.author, b.image_file, b.price
                         FROM BorrowRecords br
                         JOIN Books b ON br.book_id = b.book_id
                         WHERE br.user_id = @uid AND (br.status = 'Borrowing' OR br.status = 'Overdue')
@@ -78,52 +76,30 @@ namespace BookHubAPI.Controllers
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@uid", userId);
-                        // Lưu ý: Đối với câu query thứ 2 (status == "Borrowing"), tham số @status không được dùng trong SQL,
-                        // nhưng thêm vào cũng không gây lỗi. Nếu cẩn thận bạn có thể if/else để add param.
-                        // Ở đây tôi giữ nguyên để code gọn, SQL Server sẽ tự bỏ qua tham số thừa.
                         cmd.Parameters.AddWithValue("@status", status);
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                // SỬA: Đổi key đọc dữ liệu thành "image_file"
                                 string img = reader["image_file"] != DBNull.Value ? reader["image_file"].ToString() : "";
-
-                                // Logic ghép link ảnh
                                 if (!string.IsNullOrEmpty(img) && !img.StartsWith("http"))
-                                {
                                     img = $"{Request.Scheme}://{Request.Host}/images/{img}";
-                                }
 
-                                // ... (Phần logic status giữ nguyên) ...
+                                // 2. XỬ LÝ GIÁ TIỀN (Format sang VND)
+                                string priceStr = (reader["price"] != DBNull.Value ? Convert.ToDecimal(reader["price"]).ToString("N0") : "0") + " VND";
+
                                 string dbStatus = reader["status"].ToString();
                                 DateTime dueDate = Convert.ToDateTime(reader["due_date"]);
                                 string displayStatus = "";
                                 string statusColor = "";
 
-                                if (dbStatus == "Returned")
-                                {
-                                    displayStatus = "Đã trả";
-                                    statusColor = "#EF5350";
-                                }
-                                else if (dbStatus == "Reserved")
-                                {
-                                    displayStatus = "Sẵn sàng";
-                                    statusColor = "#66BB6A";
-                                }
+                                if (dbStatus == "Returned") { displayStatus = "Đã trả"; statusColor = "#EF5350"; }
+                                else if (dbStatus == "Reserved") { displayStatus = "Sẵn sàng"; statusColor = "#66BB6A"; }
                                 else
                                 {
-                                    if (dueDate < DateTime.Now)
-                                    {
-                                        displayStatus = "Quá hạn";
-                                        statusColor = "#D32F2F";
-                                    }
-                                    else
-                                    {
-                                        displayStatus = "Đang mượn";
-                                        statusColor = "#AB47BC";
-                                    }
+                                    if (dueDate < DateTime.Now) { displayStatus = "Quá hạn"; statusColor = "#D32F2F"; }
+                                    else { displayStatus = "Đang mượn"; statusColor = "#AB47BC"; }
                                 }
 
                                 list.Add(new
@@ -132,13 +108,16 @@ namespace BookHubAPI.Controllers
                                     bookId = reader["book_id"],
                                     title = reader["title"],
                                     author = reader["author"],
-                                    coverUrl = img, // Model Android vẫn tên là coverUrl nên ở đây giữ nguyên tên property trả về
+                                    coverUrl = img,
                                     borrowDate = Convert.ToDateTime(reader["borrow_date"]).ToString("dd/MM/yyyy"),
                                     dueDate = dueDate.ToString("dd/MM/yyyy"),
                                     returnDate = reader["return_date"] != DBNull.Value ? Convert.ToDateTime(reader["return_date"]).ToString("dd/MM/yyyy") : null,
                                     status = dbStatus,
                                     displayStatus = displayStatus,
-                                    statusColor = statusColor
+                                    statusColor = statusColor,
+
+                                    // 3. TRẢ VỀ GIÁ TIỀN
+                                    price = priceStr
                                 });
                             }
                         }
@@ -146,12 +125,7 @@ namespace BookHubAPI.Controllers
                 }
                 return Ok(list);
             }
-            catch (Exception ex)
-            {
-                // In lỗi chi tiết ra console server để bạn dễ debug
-                Console.WriteLine(ex.Message);
-                return StatusCode(500, new { message = "Lỗi Server: " + ex.Message });
-            }
+            catch (Exception ex) { return StatusCode(500, new { message = "Lỗi Server: " + ex.Message }); }
         }
 
         // =============================================================

@@ -79,7 +79,10 @@ public interface ApiService {
     @POST("api/borrow/cancel")
     Call<ActionResponse> cancelReservation(@Body ActionRequest request);
 
-    // 3. API MƯỢN SÁCH (Sửa lỗi đỏ của bạn tại đây)
+    // 3. API MƯỢN SÁCH
     @POST("api/borrow/create")
     Call<ActionResponse> borrowBook(@Body BorrowRequest request);
+    // Lấy chi tiết sách theo ID
+    @GET("api/books/detail")
+    Call<Book> getBookDetail(@Query("id") int bookId);
 }

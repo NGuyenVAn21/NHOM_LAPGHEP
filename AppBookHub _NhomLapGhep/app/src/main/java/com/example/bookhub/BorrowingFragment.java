@@ -1,4 +1,4 @@
-package com.example.bookhub; // QUAN TRỌNG: Khớp với Adapter của bạn
+package com.example.bookhub;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -21,8 +21,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.bookhub.R; // Đảm bảo import R đúng
-import com.example.bookhub.activity.ReadingActivity;
 import com.example.bookhub.api.RetrofitClient;
 import com.example.bookhub.models.ActionRequest;
 import com.example.bookhub.models.ActionResponse;
@@ -73,9 +71,6 @@ public class BorrowingFragment extends Fragment {
         SharedPreferences prefs = requireContext().getSharedPreferences("BookHubPrefs", Context.MODE_PRIVATE);
         int uid = prefs.getInt("CURRENT_USER_ID", -1);
 
-        // [DEBUG] Hiện thông báo để biết User ID là bao nhiêu
-        // Toast.makeText(getContext(), "Đang tải User ID: " + uid, Toast.LENGTH_SHORT).show();
-
         if (uid == -1) {
             Toast.makeText(getContext(), "Chưa đăng nhập (ID=-1)", Toast.LENGTH_SHORT).show();
             return;
@@ -88,11 +83,6 @@ public class BorrowingFragment extends Fragment {
                     list.clear();
                     list.addAll(response.body());
                     adapter.notifyDataSetChanged();
-
-                    // [DEBUG] Nếu danh sách rỗng, báo lên để biết
-                    if (list.isEmpty()) {
-                        // Toast.makeText(getContext(), "Danh sách trả về rỗng", Toast.LENGTH_SHORT).show();
-                    }
                 } else {
                     Toast.makeText(getContext(), "Lỗi API: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
@@ -106,7 +96,7 @@ public class BorrowingFragment extends Fragment {
         });
     }
 
-    // --- ADAPTER NỘI BỘ ---
+    // ADAPTER NỘI BỘ
     public static class BorrowingAdapter extends RecyclerView.Adapter<BorrowingAdapter.ViewHolder> {
         private Context context;
         private List<BorrowRecord> list;
@@ -121,7 +111,6 @@ public class BorrowingFragment extends Fragment {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            // Đảm bảo tên layout item đúng là item_borrowing_book
             View view = LayoutInflater.from(context).inflate(R.layout.item_borrowing_book, parent, false);
             return new ViewHolder(view);
         }
@@ -143,7 +132,7 @@ public class BorrowingFragment extends Fragment {
             // Load ảnh
             String imgUrl = b.getCoverUrl();
             if (imgUrl != null && !imgUrl.startsWith("http")) {
-                // Sửa lại IP máy ảo nếu cần (10.0.2.2)
+
                 imgUrl = "http://10.0.2.2:5280/images/" + imgUrl;
             }
             Glide.with(context).load(imgUrl).placeholder(R.drawable.ic_menu_book_round).into(holder.imgCover);
@@ -160,6 +149,26 @@ public class BorrowingFragment extends Fragment {
 
             // Nút Gia hạn
             holder.btnRenew.setOnClickListener(v -> callApiAction("extend", b.getRecordId()));
+            holder.btnView.setOnClickListener(v -> {
+                Intent intent = new Intent(context, com.example.bookhub.activity.BookDetailActivity.class);
+
+                // Tạo object Book tạm thời từ BorrowRecord để gửi sang màn hình chi tiết
+                com.example.bookhub.models.Book tempBook = new com.example.bookhub.models.Book(
+                        b.getBookId(),
+                        b.getTitle(),
+                        b.getAuthor(),
+                        0f, // Rating (float)
+                        0,  // Pages
+                        b.getDisplayStatus(), // Status
+                        // Lấy giá tiền từ API (Nếu null thì để 0 VND) ---
+                        b.getPrice() != null ? b.getPrice() : "0 VND",
+                        "Thông tin đang cập nhật..."
+                );
+
+                intent.putExtra("BOOK", tempBook);
+                intent.putExtra("BOOK_IMAGE", b.getCoverUrl());
+                context.startActivity(intent);
+            });
         }
 
         private void callApiAction(String type, int recordId) {
@@ -187,7 +196,7 @@ public class BorrowingFragment extends Fragment {
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
             TextView title, date1, date2, status;
-            MaterialButton btnReturn, btnRenew;
+            MaterialButton btnReturn, btnRenew, btnView;
             ImageView imgCover;
 
             public ViewHolder(@NonNull View itemView) {
@@ -198,6 +207,7 @@ public class BorrowingFragment extends Fragment {
                 status = itemView.findViewById(R.id.text_status);
                 btnReturn = itemView.findViewById(R.id.btn_return);
                 btnRenew = itemView.findViewById(R.id.btn_renew);
+                btnView = itemView.findViewById(R.id.btn_view);
                 imgCover = itemView.findViewById(R.id.bookImage);
             }
         }

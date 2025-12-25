@@ -129,6 +129,7 @@ public class HomeActivity extends AppCompatActivity {
         if (seeAllEvents != null) {
             seeAllEvents.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, EventsActivity.class)));
         }
+
     }
 
     private void fetchUserStats() {

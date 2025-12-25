@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="#F5F6FA">
 
-    <!-- HEADER -->
     <androidx.cardview.widget.CardView
         android:id="@+id/headerCard"
         android:layout_width="0dp"
@@ -22,7 +21,6 @@
             android:layout_height="match_parent"
             android:background="@drawable/bg_header_gradient">
 
-            <!-- Avatar -->
             <ImageView
                 android:id="@+id/imgAvatar"
                 android:layout_width="85dp"
@@ -34,7 +32,6 @@
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_user" />
 
-            <!-- Name -->
             <TextView
                 android:id="@+id/txtName"
                 android:layout_width="wrap_content"
@@ -42,23 +39,21 @@
                 android:layout_below="@id/imgAvatar"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="12dp"
-                android:text="Nguyễn Văn A"
+                android:text="Đang tải tên..."
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <!-- Email -->
             <TextView
                 android:id="@+id/txtEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/txtName"
                 android:layout_centerHorizontal="true"
-                android:text="nguyenvana@email.com"
+                android:text="BookHub Member"
                 android:textColor="#EDEDED"
                 android:textSize="14sp" />
 
-            <!-- Stats Row -->
             <LinearLayout
                 android:id="@+id/statsRow"
                 android:layout_width="match_parent"
@@ -69,7 +64,6 @@
                 android:orientation="horizontal"
                 android:paddingBottom="10dp">
 
-                <!-- Borrowed -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -78,9 +72,10 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tvStatBorrowed"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="24"
+                        android:text="0"
                         android:textColor="@android:color/white"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -93,7 +88,6 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                <!-- Read -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -102,9 +96,10 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tvStatRead"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="18"
+                        android:text="0"
                         android:textColor="@android:color/white"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -117,7 +112,6 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                <!-- Days -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -126,9 +120,10 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tvStatDays"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="42"
+                        android:text="0"
                         android:textColor="@android:color/white"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -143,7 +138,6 @@
 
             </LinearLayout>
 
-            <!-- Edit profile button MUST BE OUTSIDE statsRow -->
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnEditProfile"
                 android:layout_width="wrap_content"
@@ -160,11 +154,9 @@
                 android:paddingRight="26dp"
                 android:paddingBottom="8dp"/>
 
-
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- MENU BLOCK -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -181,7 +173,6 @@
             android:padding="12dp"
             android:background="#FFFFFF">
 
-            <!-- ITEM 1: INFO -->
             <LinearLayout
                 android:id="@+id/itemInfo"
                 android:layout_width="match_parent"
@@ -216,7 +207,6 @@
                     app:tint="#6F6F6F"/>
             </LinearLayout>
 
-            <!-- SUBMENU INFO -->
             <LinearLayout
                 android:id="@+id/subMenuInfo"
                 android:layout_width="match_parent"
@@ -252,7 +242,6 @@
 
             <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE"/>
 
-            <!-- ITEM 2 -->
             <LinearLayout
                 android:id="@+id/itemFavorite"
                 android:layout_width="match_parent"
@@ -281,7 +270,6 @@
 
             <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE"/>
 
-            <!-- ITEM 3: HISTORY -->
             <LinearLayout
                 android:id="@+id/itemHistory"
                 android:layout_width="match_parent"
@@ -315,7 +303,6 @@
                     app:tint="#6F6F6F"/>
             </LinearLayout>
 
-            <!-- SUBMENU HISTORY -->
             <LinearLayout
                 android:id="@+id/subMenuHistory"
                 android:layout_width="match_parent"
@@ -351,7 +338,6 @@
 
             <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE"/>
 
-            <!-- ITEM 4 SETTINGS -->
             <LinearLayout
                 android:id="@+id/itemSettings"
                 android:layout_width="match_parent"
@@ -380,7 +366,6 @@
 
             <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE"/>
 
-            <!-- ITEM 5 HELP -->
             <LinearLayout
                 android:id="@+id/itemHelp"
                 android:layout_width="match_parent"
@@ -409,7 +394,6 @@
 
             <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE"/>
 
-            <!-- ITEM 6 ABOUT -->
             <LinearLayout
                 android:id="@+id/itemAbout"
                 android:layout_width="match_parent"
@@ -438,7 +422,6 @@
 
             <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE"/>
 
-            <!-- ITEM 7 LOGOUT -->
             <LinearLayout
                 android:id="@+id/itemLogout"
                 android:layout_width="match_parent"

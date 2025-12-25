@@ -61,5 +61,43 @@ namespace BookHubAPI.Controllers
             }
             catch (Exception ex) { return StatusCode(500, "Lỗi: " + ex.Message); }
         }
+        // Trong class StatsController:
+
+        [HttpGet("user-summary")]
+        public IActionResult GetUserSummary(int userId)
+        {
+            try
+            {
+                string connectionString = _configuration.GetConnectionString("DefaultConnection");
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    // 1. Đếm sách ĐANG MƯỢN
+                    string sqlBorrow = "SELECT COUNT(*) FROM BorrowRecords WHERE user_id = @uid AND status = 'Borrowing'";
+                    SqlCommand cmdBorrow = new SqlCommand(sqlBorrow, conn);
+                    cmdBorrow.Parameters.AddWithValue("@uid", userId);
+                    int borrowCount = (int)cmdBorrow.ExecuteScalar();
+
+                    // 2. Đếm sách SẮP ĐẾN HẠN (Ví dụ: Còn 3 ngày nữa hết hạn)
+                    // Logic: Đang mượn VÀ DueDate <= Ngày hiện tại + 3 ngày
+                    string sqlDue = @"SELECT COUNT(*) FROM BorrowRecords 
+                              WHERE user_id = @uid 
+                              AND status = 'Borrowing' 
+                              AND due_date <= DATEADD(day, 3, GETDATE())";
+
+                    SqlCommand cmdDue = new SqlCommand(sqlDue, conn);
+                    cmdDue.Parameters.AddWithValue("@uid", userId);
+                    int dueSoonCount = (int)cmdDue.ExecuteScalar();
+
+                    return Ok(new
+                    {
+                        borrowing = borrowCount,
+                        dueSoon = dueSoonCount
+                    });
+                }
+            }
+            catch (Exception ex) { return StatusCode(500, "Lỗi: " + ex.Message); }
+        }
     }
 }

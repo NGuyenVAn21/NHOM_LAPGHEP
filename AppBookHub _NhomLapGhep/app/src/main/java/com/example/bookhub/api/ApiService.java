@@ -52,4 +52,25 @@ public interface ApiService {
 
     @GET("api/stats/user-summary")
     Call<UserStatsResponse> getUserStats(@Query("userId") int userId);
+    // API MƯỢN SÁCH
+
+    // 1. Lấy danh sách 3 Tab
+    @GET("api/borrow/current")
+    Call<List<com.example.bookhub.models.BorrowRecord>> getCurrentBorrows(@Query("userId") int userId);
+
+    @GET("api/borrow/history")
+    Call<List<com.example.bookhub.models.BorrowRecord>> getHistory(@Query("userId") int userId);
+
+    @GET("api/borrow/reservations")
+    Call<List<com.example.bookhub.models.BorrowRecord>> getReservations(@Query("userId") int userId);
+
+    // 2. Các hành động (Nút bấm)
+    @POST("api/borrow/return")
+    Call<com.example.bookhub.models.ActionResponse> returnBook(@Body com.example.bookhub.models.ActionRequest request);
+
+    @POST("api/borrow/extend")
+    Call<com.example.bookhub.models.ActionResponse> extendBook(@Body com.example.bookhub.models.ActionRequest request);
+
+    @POST("api/borrow/cancel")
+    Call<com.example.bookhub.models.ActionResponse> cancelReservation(@Body com.example.bookhub.models.ActionRequest request);
 }

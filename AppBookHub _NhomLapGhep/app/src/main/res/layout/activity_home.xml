@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_grey"
-    tools:context=".MainActivity">
+    tools:context=".activity.HomeActivity">
 
     <RelativeLayout
         android:id="@+id/header_container"
@@ -74,9 +74,10 @@
                 android:paddingBottom="40dp">
 
                 <TextView
+                    android:id="@+id/tv_home_username"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Xin chào, Nguyễn Văn A!"
+                    android:text="Xin chào, User!"
                     android:textColor="@color/white"
                     android:textSize="24sp"
                     android:textStyle="bold"
@@ -85,49 +86,33 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Thứ Hai, 15 tháng 11, 2023"
+                    android:text="Hôm nay bạn muốn đọc gì?"
                     android:textColor="#EFEFEF"
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <com.google.android.material.card.MaterialCardView
+            <EditText
+                android:id="@+id/et_search_home"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="-30dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@color/white">
+                android:layout_marginTop="-25dp"
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="12dp"
-                    android:gravity="center_vertical">
+                android:background="@drawable/bg_search_input"
+                android:drawableStart="@drawable/ic_search_round"
+                android:drawablePadding="12dp"
+                android:paddingHorizontal="16dp"
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_search_round"
-                        app:tint="@color/grey_text" />
+                android:hint="Tìm kiếm sách, tác giả..."
+                android:textSize="14sp"
+                android:textColorHint="#9E9E9E"
+                android:textColor="@color/black_app"
 
-                    <EditText
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@android:color/transparent"
-                        android:hint="Tìm kiếm sách, tác giả..."
-                        android:paddingHorizontal="12dp"
-                        android:textSize="16sp" />
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_tune_round"
-                        app:tint="@color/grey_text" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                android:inputType="text"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:imeOptions="actionSearch"
+                android:elevation="4dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -153,9 +138,10 @@
                         android:padding="20dp"
                         android:gravity="center">
                         <TextView
+                            android:id="@+id/tv_borrowing_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="7"
+                            android:text="0"
                             android:textSize="32sp"
                             android:textStyle="bold"
                             android:textColor="@color/primary_color"
@@ -185,9 +171,10 @@
                         android:padding="20dp"
                         android:gravity="center">
                         <TextView
+                            android:id="@+id/tv_due_soon_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="3"
+                            android:text="0"
                             android:textSize="32sp"
                             android:textStyle="bold"
                             android:textColor="@color/secondary_color"
@@ -207,106 +194,106 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingHorizontal="16dp"
-                android:layout_marginTop="16dp"
-                android:baselineAligned="false"
-                android:weightSum="3">
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                android:weightSum="3"
+                android:baselineAligned="false">
 
-                <com.google.android.material.card.MaterialCardView
+                <LinearLayout
+                    android:id="@+id/btn_feature_borrow"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="12dp"
+                    android:background="@drawable/bg_ripple_white"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:layout_marginEnd="6dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp"
-                        android:gravity="center">
-                        <ImageView
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:background="@drawable/gradient_accent"
-                            android:padding="8dp"
-                            android:src="@drawable/ic_bookmark_round"
-                            app:tint="@color/white"
-                            android:layout_marginBottom="8dp"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Mượn sách"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/dark_grey"/>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                    android:elevation="2dp">
 
-                <com.google.android.material.card.MaterialCardView
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="8dp"
+                        android:background="@drawable/bg_circle_blue_light"
+                        android:src="@drawable/ic_bookmark_round"
+                        app:tint="@color/primary_color"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mượn sách"
+                        android:textSize="13sp"
+                        android:textColor="@color/black_app"
+                        android:textStyle="bold"
+                        android:layout_marginTop="8dp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/btn_feature_return"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="12dp"
+                    android:background="@drawable/bg_ripple_white"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:layout_marginHorizontal="6dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp"
-                        android:gravity="center">
-                        <ImageView
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:background="@drawable/gradient_accent"
-                            android:padding="8dp"
-                            android:src="@drawable/ic_bookmark_round"
-                            app:tint="@color/white"
-                            android:layout_marginBottom="8dp"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Trả sách"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/dark_grey"/>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                    android:elevation="2dp">
 
-                <com.google.android.material.card.MaterialCardView
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="8dp"
+                        android:background="@drawable/bg_circle_pink_light"
+                        android:src="@drawable/ic_history"
+                        app:tint="@color/secondary_color"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lịch sử"
+                        android:textSize="13sp"
+                        android:textColor="@color/black_app"
+                        android:textStyle="bold"
+                        android:layout_marginTop="8dp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/btn_feature_read"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="12dp"
+                    android:background="@drawable/bg_ripple_white"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:layout_marginStart="6dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    android:elevation="2dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="8dp"
+                        android:background="@drawable/bg_circle_green_light"
+                        android:src="@drawable/ic_menu_book_round"
+                        app:tint="#4CAF50"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp"
-                        android:gravity="center">
-                        <ImageView
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:background="@drawable/gradient_accent"
-                            android:padding="8dp"
-                            android:src="@drawable/ic_menu_book_round"
-                            app:tint="@color/white"
-                            android:layout_marginBottom="8dp"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Đọc online"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/dark_grey"/>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                        android:text="Đọc Online"
+                        android:textSize="13sp"
+                        android:textColor="@color/black_app"
+                        android:textStyle="bold"
+                        android:layout_marginTop="8dp"/>
+                </LinearLayout>
             </LinearLayout>
 
             <com.google.android.material.card.MaterialCardView
@@ -348,89 +335,14 @@
                             android:background="?attr/selectableItemBackground"/>
                     </RelativeLayout>
 
-                    <HorizontalScrollView
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_events_featured"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:scrollbars="none"
+                        android:orientation="horizontal"
+                        android:paddingStart="12dp"
                         android:clipToPadding="false"
-                        android:paddingBottom="8dp">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:id="@+id/card_featured_event_1"
-                                android:layout_width="200dp"
-                                android:layout_height="100dp"
-                                android:layout_marginEnd="16dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="0dp"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:foreground="?attr/selectableItemBackground">
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:background="@drawable/gradient_accent"
-                                    android:orientation="vertical"
-                                    android:padding="20dp">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="Tuần lễ Sách Mới"
-                                        android:textColor="@color/white"
-                                        android:textSize="16sp"
-                                        android:textStyle="bold" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="Khám phá hơn 100 đầu sách mới nhất"
-                                        android:textColor="#EFEFEF"
-                                        android:textSize="12sp"
-                                        android:alpha="0.9" />
-                                </LinearLayout>
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:id="@+id/card_featured_event_2"
-                                android:layout_width="200dp"
-                                android:layout_height="100dp"
-                                android:layout_marginEnd="16dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="0dp"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:foreground="?attr/selectableItemBackground">
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:background="@drawable/gradient_accent"
-                                    android:orientation="vertical"
-                                    android:padding="20dp">
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="Giảm giá 20%"
-                                        android:textColor="@color/white"
-                                        android:textSize="16sp"
-                                        android:textStyle="bold" />
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="Áp dụng cho tất cả sách văn học"
-                                        android:textColor="#EFEFEF"
-                                        android:textSize="12sp"
-                                        android:alpha="0.9" />
-                                </LinearLayout>
-                            </com.google.android.material.card.MaterialCardView>
-                        </LinearLayout>
-                    </HorizontalScrollView>
+                        android:paddingBottom="8dp"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -438,6 +350,41 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@color/white">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/white"
+                    android:paddingBottom="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Độc giả tích cực"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black_app"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginBottom="16dp"/>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_active_readers"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingStart="16dp"
+                        android:clipToPadding="false"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="8dp"
@@ -447,215 +394,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:paddingVertical="20dp">
 
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Độc giả tích cực"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/black_app"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Xem tất cả >"
-                            android:textSize="14sp"
-                            android:textColor="@color/primary_color"
-                            android:layout_alignParentEnd="true"
-                            android:background="?attr/selectableItemBackground"/>
-                    </RelativeLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="12dp"
-                        android:gravity="center_vertical"
-                        android:background="@color/background_grey"
-                        android:layout_marginBottom="8dp">
-                        <TextView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:background="@drawable/gradient_accent"
-                            android:text="1"
-                            android:gravity="center"
-                            android:textColor="@color/white"
-                            android:textStyle="bold"
-                            android:layout_marginEnd="12dp"/>
-                        <ImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:src="@drawable/ic_person_round"
-                            app:tint="@color/grey_text"
-                            android:background="@color/primary_light"
-                            android:padding="8dp"
-                            android:layout_marginEnd="12dp"/>
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Trần Minh Châu"
-                                android:textStyle="bold"
-                                android:textColor="@color/black_app"/>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="42 sách đã mượn"
-                                android:textSize="12sp"
-                                android:textColor="@color/grey_text"/>
-                        </LinearLayout>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Top 1"
-                            android:background="@color/primary_color"
-                            android:textColor="@color/white"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="4dp"
-                            android:textSize="10sp"
-                            android:textStyle="bold"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="12dp"
-                        android:gravity="center_vertical"
-                        android:background="@color/background_grey"
-                        android:layout_marginBottom="8dp">
-                        <TextView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:background="@drawable/gradient_accent"
-                            android:text="2"
-                            android:gravity="center"
-                            android:textColor="@color/white"
-                            android:textStyle="bold"
-                            android:layout_marginEnd="12dp"/>
-                        <ImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:src="@drawable/ic_person_round"
-                            app:tint="@color/grey_text"
-                            android:background="@color/primary_light"
-                            android:padding="8dp"
-                            android:layout_marginEnd="12dp"/>
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Lê Hoàng Anh"
-                                android:textStyle="bold"
-                                android:textColor="@color/black_app"/>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="38 sách đã mượn"
-                                android:textSize="12sp"
-                                android:textColor="@color/grey_text"/>
-                        </LinearLayout>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Top 2"
-                            android:background="@color/primary_color"
-                            android:textColor="@color/white"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="4dp"
-                            android:textSize="10sp"
-                            android:textStyle="bold"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="12dp"
-                        android:gravity="center_vertical"
-                        android:background="@color/background_grey">
-                        <TextView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:background="@drawable/gradient_accent"
-                            android:text="3"
-                            android:gravity="center"
-                            android:textColor="@color/white"
-                            android:textStyle="bold"
-                            android:layout_marginEnd="12dp"/>
-                        <ImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:src="@drawable/ic_person_round"
-                            app:tint="@color/grey_text"
-                            android:background="@color/primary_light"
-                            android:padding="8dp"
-                            android:layout_marginEnd="12dp"/>
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Phạm Quỳnh Mai"
-                                android:textStyle="bold"
-                                android:textColor="@color/black_app"/>
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="35 sách đã mượn"
-                                android:textSize="12sp"
-                                android:textColor="@color/grey_text"/>
-                        </LinearLayout>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Top 3"
-                            android:background="@color/primary_color"
-                            android:textColor="@color/white"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="4dp"
-                            android:textSize="10sp"
-                            android:textStyle="bold"/>
-                    </LinearLayout>
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="@color/white">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp">
+                        android:layout_marginBottom="12dp"
+                        android:paddingHorizontal="20dp">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -673,149 +418,14 @@
                             android:background="?attr/selectableItemBackground"/>
                     </RelativeLayout>
 
-                    <HorizontalScrollView
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_new_books"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:scrollbars="none"
-                        android:clipToPadding="false"
-                        android:paddingEnd="16dp">
+                        android:orientation="horizontal"
+                        android:paddingStart="20dp"
+                        android:clipToPadding="false"/>
 
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <LinearLayout
-                                android:layout_width="120dp"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:layout_marginEnd="16dp"
-                                android:gravity="center_horizontal">
-                                <com.google.android.material.card.MaterialCardView
-                                    android:layout_width="80dp"
-                                    android:layout_height="100dp"
-                                    app:cardCornerRadius="12dp"
-                                    app:cardElevation="0dp"
-                                    app:cardBackgroundColor="@color/primary_light"
-                                    android:layout_marginBottom="8dp">
-                                    <ImageView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:src="@drawable/anh_nha_gia_kim"
-                                        android:scaleType="centerCrop"/>
-                                </com.google.android.material.card.MaterialCardView>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Nhà Giả Kim"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/black_app"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Paulo Coelho"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/grey_text"/>
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center"
-                                    android:layout_marginTop="4dp">
-                                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_bookmark_round" app:tint="@color/primary_color"/>
-                                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_shopping_cart_round" app:tint="@color/primary_color" android:layout_marginStart="8dp"/>
-                                </LinearLayout>
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="120dp"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:layout_marginEnd="16dp"
-                                android:gravity="center_horizontal">
-                                <com.google.android.material.card.MaterialCardView
-                                    android:layout_width="80dp"
-                                    android:layout_height="100dp"
-                                    app:cardCornerRadius="12dp"
-                                    app:cardElevation="0dp"
-                                    app:cardBackgroundColor="@color/primary_light"
-                                    android:layout_marginBottom="8dp">
-                                    <ImageView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:src="@drawable/anh_dacnhantam"
-                                        android:scaleType="centerCrop"/>
-                                </com.google.android.material.card.MaterialCardView>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Đắc Nhân Tâm"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/black_app"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Dale Carnegie"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/grey_text"/>
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center"
-                                    android:layout_marginTop="4dp">
-                                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_bookmark_round" app:tint="@color/primary_color"/>
-                                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_shopping_cart_round" app:tint="@color/primary_color" android:layout_marginStart="8dp"/>
-                                </LinearLayout>
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="120dp"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:layout_marginEnd="16dp"
-                                android:gravity="center_horizontal">
-                                <com.google.android.material.card.MaterialCardView
-                                    android:layout_width="80dp"
-                                    android:layout_height="100dp"
-                                    app:cardCornerRadius="12dp"
-                                    app:cardElevation="0dp"
-                                    app:cardBackgroundColor="@color/primary_light"
-                                    android:layout_marginBottom="8dp">
-                                    <ImageView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:src="@drawable/anhtuoitre"
-                                        android:scaleType="centerCrop"/>
-                                </com.google.android.material.card.MaterialCardView>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Tuổi Trẻ Đáng Giá"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/black_app"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Rosie Nguyễn"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/grey_text"/>
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center"
-                                    android:layout_marginTop="4dp">
-                                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_bookmark_round" app:tint="@color/primary_color"/>
-                                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_shopping_cart_round" app:tint="@color/primary_color" android:layout_marginStart="8dp"/>
-                                </LinearLayout>
-                            </LinearLayout>
-
-                        </LinearLayout>
-                    </HorizontalScrollView>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -832,12 +442,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:paddingVertical="20dp">
 
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp">
+                        android:layout_marginBottom="12dp"
+                        android:paddingHorizontal="20dp">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -855,155 +466,14 @@
                             android:background="?attr/selectableItemBackground"/>
                     </RelativeLayout>
 
-                    <HorizontalScrollView
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_popular_books"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:scrollbars="none"
-                        android:clipToPadding="false"
-                        android:paddingEnd="16dp">
+                        android:orientation="horizontal"
+                        android:paddingStart="20dp"
+                        android:clipToPadding="false"/>
 
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <LinearLayout
-                                android:layout_width="120dp"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:layout_marginEnd="16dp"
-                                android:gravity="center_horizontal">
-                                <com.google.android.material.card.MaterialCardView
-                                    android:layout_width="80dp"
-                                    android:layout_height="100dp"
-                                    app:cardCornerRadius="12dp"
-                                    app:cardElevation="0dp"
-                                    app:cardBackgroundColor="@color/primary_light"
-                                    android:layout_marginBottom="8dp">
-                                    <ImageView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:src="@drawable/anh_sapiens"
-                                        android:scaleType="centerCrop"/>
-                                </com.google.android.material.card.MaterialCardView>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Sapiens"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/black_app"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Yuval Noah Harari"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/grey_text"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center"
-                                    android:layout_marginTop="4dp">
-                                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_bookmark_round" app:tint="@color/primary_color"/>
-                                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_shopping_cart_round" app:tint="@color/primary_color" android:layout_marginStart="8dp"/>
-                                </LinearLayout>
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="120dp"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:layout_marginEnd="16dp"
-                                android:gravity="center_horizontal">
-                                <com.google.android.material.card.MaterialCardView
-                                    android:layout_width="80dp"
-                                    android:layout_height="100dp"
-                                    app:cardCornerRadius="12dp"
-                                    app:cardElevation="0dp"
-                                    app:cardBackgroundColor="@color/primary_light"
-                                    android:layout_marginBottom="8dp">
-                                    <ImageView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:src="@drawable/anhtamlyhoc"
-                                        android:scaleType="centerCrop"/>
-                                </com.google.android.material.card.MaterialCardView>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Tâm Lý Học"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/black_app"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Robert S. Feldman"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/grey_text"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center"
-                                    android:layout_marginTop="4dp">
-                                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_bookmark_round" app:tint="@color/primary_color"/>
-                                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_shopping_cart_round" app:tint="@color/primary_color" android:layout_marginStart="8dp"/>
-                                </LinearLayout>
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="120dp"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:layout_marginEnd="16dp"
-                                android:gravity="center_horizontal">
-                                <com.google.android.material.card.MaterialCardView
-                                    android:layout_width="80dp"
-                                    android:layout_height="100dp"
-                                    app:cardCornerRadius="12dp"
-                                    app:cardElevation="0dp"
-                                    app:cardBackgroundColor="@color/primary_light"
-                                    android:layout_marginBottom="8dp">
-                                    <ImageView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:src="@drawable/anhhomedeus"
-                                        android:scaleType="centerCrop"/>
-                                </com.google.android.material.card.MaterialCardView>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Homo Deus"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/black_app"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Yuval Noah Harari"
-                                    android:textSize="12sp"
-                                    android:textColor="@color/grey_text"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"/>
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center"
-                                    android:layout_marginTop="4dp">
-                                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_bookmark_round" app:tint="@color/primary_color"/>
-                                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_shopping_cart_round" app:tint="@color/primary_color" android:layout_marginStart="8dp"/>
-                                </LinearLayout>
-                            </LinearLayout>
-
-                        </LinearLayout>
-                    </HorizontalScrollView>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -1020,4 +490,5 @@
         app:menu="@menu/bottom_navigation"
         app:itemIconTint="@color/primary_color"
         app:itemTextColor="@color/primary_color"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

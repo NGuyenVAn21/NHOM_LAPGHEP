@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using System.Data;
+using Microsoft.Extensions.Configuration; // Thư viện để đọc appsettings.json
 
 namespace BookHubAPI.Controllers
 {
@@ -8,19 +9,32 @@ namespace BookHubAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly string connectionString = "Server=ADMIN-PC,1433;Database=bookhub_db;User Id=sa;Password=123456;TrustServerCertificate=True;";
+        // 1. Khai báo biến cấu hình
+        private readonly IConfiguration _configuration;
 
-        // 1. API ĐĂNG KÝ
+        // 2. Inject cấu hình vào Constructor
+        public AuthController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        // Helper: Lấy chuỗi kết nối gọn gàng
+        private string GetConnectionString()
+        {
+            return _configuration.GetConnectionString("DefaultConnection");
+        }
+
         [HttpPost("register")]
         public IActionResult Register([FromBody] RegisterRequest request)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // Sửa đoạn này: Lấy connection string từ hàm GetConnectionString()
+                using (SqlConnection conn = new SqlConnection(GetConnectionString()))
                 {
                     conn.Open();
 
-                    // Kiểm tra user tồn tại
+                    // --- LOGIC CŨ GIỮ NGUYÊN ---
                     string checkSql = "SELECT COUNT(*) FROM Users WHERE username = @username OR email = @email";
                     using (SqlCommand checkCmd = new SqlCommand(checkSql, conn))
                     {
@@ -34,7 +48,6 @@ namespace BookHubAPI.Controllers
                         }
                     }
 
-                    // Thêm user mới
                     string insertSql = "INSERT INTO Users (full_name, email, username, password_hash) VALUES (@fullName, @email, @username, @password)";
                     using (SqlCommand insertCmd = new SqlCommand(insertSql, conn))
                     {
@@ -44,6 +57,7 @@ namespace BookHubAPI.Controllers
                         insertCmd.Parameters.AddWithValue("@password", request.Password);
                         insertCmd.ExecuteNonQuery();
                     }
+                    // ----------------------------
                 }
 
                 return Ok(new { status = "Success", message = "Đăng ký thành công!" });
@@ -54,16 +68,17 @@ namespace BookHubAPI.Controllers
             }
         }
 
-        // 2. API ĐĂNG NHẬP
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                // Sửa đoạn này:
+                using (SqlConnection conn = new SqlConnection(GetConnectionString()))
                 {
                     conn.Open();
 
+                    // --- LOGIC CŨ GIỮ NGUYÊN ---
                     string sql = "SELECT user_id, full_name, email FROM Users WHERE username = @username AND password_hash = @password";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
@@ -74,7 +89,6 @@ namespace BookHubAPI.Controllers
                         {
                             if (reader.Read())
                             {
-                                // Lấy thông tin user
                                 var user = new
                                 {
                                     Id = reader["user_id"],
@@ -95,6 +109,7 @@ namespace BookHubAPI.Controllers
                             }
                         }
                     }
+                    // ----------------------------
                 }
             }
             catch (Exception ex)
@@ -104,7 +119,7 @@ namespace BookHubAPI.Controllers
         }
     }
 
-    // --- CÁC CLASS DỮ LIỆU (DTO) ---
+    // --- DTO CLASSES ---
     public class RegisterRequest
     {
         public string FullName { get; set; }

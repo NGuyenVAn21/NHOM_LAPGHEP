@@ -21,3 +21,10 @@ obj/
 
 # VS Code
 .vscode/
+<<<<<<< HEAD
+=======
+.idea/
+BookHubAPI/.vs/
+BookHubAPI/BookHubAPI/obj/
+BookHubAPI/BookHubAPI/bin/
+>>>>>>> main

@@ -1,4 +1,4 @@
-@BookHubAPI_HostAddress = http://localhost:5177
+@BookHubAPI_HostAddress = http://localhost:5280
 
 GET {{BookHubAPI_HostAddress}}/weatherforecast/
 Accept: application/json

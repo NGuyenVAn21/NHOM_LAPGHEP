@@ -1,0 +1,105 @@
+﻿<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-primary">📚 Quản lý Sách</h2>
+    <button class="btn btn-success" onclick="openAddBookModal()">
+        <i class="fas fa-plus me-1"></i> Thêm sách
+    </button>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <select class="form-select" id="categoryFilter">
+            <option value="">Tất cả danh mục</option>
+            <option value="1">Văn học</option>
+            <option value="2">Kinh tế</option>
+            <option value="3">Tâm lý</option>
+            <option value="4">Khoa học</option>
+            <option value="5">Lịch sử</option>
+            <option value="6">Kỹ năng</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <input type="text" class="form-control" placeholder="Tìm theo tên, tác giả..." id="searchInput">
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-primary" id="searchBtn">Tìm</button>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Bìa</th>
+                <th>Tên sách</th>
+                <th>Tác giả</th>
+                <th>Danh mục</th>
+                <th>Trạng thái</th>
+                <th>Tồn kho</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody id="bookTable"></tbody>
+    </table>
+</div>
+
+<!-- Modal Thêm/Sửa -->
+<div class="modal fade" id="bookModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm sách mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="bookId">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tên sách *</label>
+                        <input type="text" class="form-control" id="title" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tác giả *</label>
+                        <input type="text" class="form-control" id="author" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Danh mục *</label>
+                        <select class="form-select" id="categoryId" required>
+                            <option value="">Chọn danh mục</option>
+                            <option value="1">Văn học</option>
+                            <option value="2">Kinh tế</option>
+                            <option value="3">Tâm lý</option>
+                            <option value="4">Khoa học</option>
+                            <option value="5">Lịch sử</option>
+                            <option value="6">Kỹ năng</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Giá (VND)</label>
+                        <input type="number" class="form-control" id="price" value="0">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="description" rows="3"></textarea>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Tồn kho</label>
+                        <input type="number" class="form-control" id="stockQuantity" value="1">
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="form-label">URL ảnh bìa</label>
+                        <input type="text" class="form-control" id="coverImageUrl">
+                        <div class="mt-2">
+                            <img id="coverPreview" src="https://via.placeholder.com/150" width="100" class="border rounded">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="saveBookBtn">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+

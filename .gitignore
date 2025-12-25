@@ -1,5 +1,23 @@
+# Visual Studio
+.vs/
+bin/
+obj/
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+
+# Visual Studio cache/options
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+*.dll
 *.exe
-*.o
-*.obj
+*.pdb
+*.cache
+
+# VS Code
 .vscode/
-.idea/

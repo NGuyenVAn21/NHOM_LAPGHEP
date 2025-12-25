@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.bookhub.R;
 import com.example.bookhub.adapter.EventAdapter;
 import com.example.bookhub.api.RetrofitClient;
-import com.example.bookhub.model.Event;
+import com.example.bookhub.models.Event;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;

@@ -1,4 +1,4 @@
-package com.example.bookhub.model;
+package com.example.bookhub.models;
 
 public class RegistrationRequest {
     private int userId;

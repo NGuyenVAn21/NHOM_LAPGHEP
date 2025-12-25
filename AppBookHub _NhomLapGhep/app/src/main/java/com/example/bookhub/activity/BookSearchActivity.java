@@ -17,7 +17,7 @@ import com.example.bookhub.R;
 import com.example.bookhub.adapter.BookAdapter;
 import com.example.bookhub.api.ApiService;
 import com.example.bookhub.api.RetrofitClient;
-import com.example.bookhub.model.Book;
+import com.example.bookhub.models.Book;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;

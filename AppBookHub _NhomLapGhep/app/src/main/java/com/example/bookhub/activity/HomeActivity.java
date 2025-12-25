@@ -9,14 +9,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.bookhub.R;
-import com.example.bookhub.adapter.BookAdapter;
 import com.example.bookhub.adapter.EventHomeAdapter;
 import com.example.bookhub.adapter.HomeAdapter; // Dùng Adapter mới
 import com.example.bookhub.adapter.UserRankAdapter;
 import com.example.bookhub.api.RetrofitClient;
-import com.example.bookhub.model.Book;
-import com.example.bookhub.model.Event;
-import com.example.bookhub.model.UserRank;
+import com.example.bookhub.models.Book;
+import com.example.bookhub.models.Event;
+import com.example.bookhub.models.UserRank;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.List;
 import retrofit2.Call;

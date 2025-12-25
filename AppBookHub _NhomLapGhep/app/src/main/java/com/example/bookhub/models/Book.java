@@ -1,4 +1,4 @@
-package com.example.bookhub.model;
+package com.example.bookhub.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -1,48 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- ========================== -->
-    <!-- PRIMARY COLORS -->
-    <!-- ========================== -->
     <color name="primary_color">#6C63FF</color>
     <color name="primary_dark">#5A52D5</color>
     <color name="primary_light">#E6E4FF</color>
     <color name="primary_start">#6C63FF</color>
     <color name="primary_end">#5A52D5</color>
 
-    <!-- ========================== -->
-    <!-- SECONDARY COLORS -->
-    <!-- ========================== -->
     <color name="secondary_color">#FF6584</color>
     <color name="secondary_light">#FFE6EB</color>
     <color name="secondary_start">#FF6584</color>
     <color name="secondary_end">#FF4757</color>
 
-    <!-- ========================== -->
-    <!-- ACCENT COLORS -->
-    <!-- ========================== -->
     <color name="accent_color">#36D1DC</color>
-<<<<<<< HEAD
+    <color name="accent_light">#E0F7FA</color>
+
     <color name="accent_start">#36D1DC</color>
     <color name="accent_end">#5B86E5</color>
-=======
-    <color name="accent_start">#667eea</color>
-    <color name="accent_end">#764ba2</color>
-    <color name="accent_light">#E0F7FA</color>
->>>>>>> c2cac68d4af52a97d36a6f7803a2b9c2807cb0c6
 
-    <!-- ========================== -->
-    <!-- GRADIENT COLORS -->
-    <!-- ========================== -->
+    <color name="accent_start_alt">#667eea</color>
+    <color name="accent_end_alt">#764ba2</color>
+
     <color name="gradient_start">#6C63FF</color>
     <color name="gradient_center">#7B6CF6</color>
     <color name="gradient_end">#36D1DC</color>
     <color name="header_start">#6C63FF</color>
     <color name="header_end">#36D1DC</color>
 
-    <!-- ========================== -->
-    <!-- BASIC COLORS -->
-    <!-- ========================== -->
     <color name="white">#FFFFFF</color>
     <color name="black">#1E1E2D</color>
     <color name="black_app">#1E1E2D</color>
@@ -53,50 +37,35 @@
     <color name="background_grey">#F8F9FF</color>
     <color name="divider_grey">#E2E4F0</color>
 
-    <!-- ========================== -->
-    <!-- STATUS COLORS -->
-    <!-- ========================== -->
     <color name="success_green">#2ECC71</color>
     <color name="warning_orange">#FF9E64</color>
     <color name="error_red">#FF4757</color>
     <color name="info_blue">#3498DB</color>
 
-    <!-- ========================== -->
-    <!-- MATERIAL DESIGN COLORS -->
-    <!-- ========================== -->
     <color name="purple_200">#6C63FF</color>
     <color name="purple_500">#5A52D5</color>
     <color name="purple_700">#4A44B8</color>
     <color name="teal_200">#36D1DC</color>
     <color name="teal_700">#2AA8B3</color>
-<<<<<<< HEAD
+
     <color name="bg_app">#F5F7FA</color>
     <color name="primary_blue">#40C4FF</color>
-    <color name="black_app">#1E1E2D</color>
-    <color name="grey_text">#8A8AA3</color>
+
     <color name="btn_pink">#FF6B81</color>
     <color name="btn_purple_light">#EDE7F6</color>
     <color name="text_purple">#6200EE</color>
     <color name="btn_teal">#26C6DA</color>
+
     <color name="status_borrowing_bg">#E8EAF6</color>
     <color name="status_borrowing_text">#3F51B5</color>
     <color name="status_overdue_bg">#FFEBEE</color>
     <color name="status_overdue_text">#F44336</color>
-</resources>
-=======
 
-    <!-- ========================== -->
-    <!-- BOOK COVER GRADIENT -->
-    <!-- ========================== -->
     <color name="book_cover_start">#667eea</color>
     <color name="book_cover_end">#764ba2</color>
 
-    <!-- ========================== -->
-    <!-- TRANSPARENT COLORS -->
-    <!-- ========================== -->
     <color name="transparent">#00000000</color>
     <color name="semi_transparent">#80000000</color>
     <color name="white_transparent">#80FFFFFF</color>
 
 </resources>
->>>>>>> c2cac68d4af52a97d36a6f7803a2b9c2807cb0c6

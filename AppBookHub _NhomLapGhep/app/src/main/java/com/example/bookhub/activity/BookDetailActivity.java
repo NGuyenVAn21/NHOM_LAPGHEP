@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.example.bookhub.R;
-import com.example.bookhub.model.Book;
+import com.example.bookhub.models.Book;
 
 public class BookDetailActivity extends AppCompatActivity {
 

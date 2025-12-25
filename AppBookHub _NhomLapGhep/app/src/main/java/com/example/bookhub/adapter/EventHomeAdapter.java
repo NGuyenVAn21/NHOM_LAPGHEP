@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.bookhub.R;
 import com.example.bookhub.activity.EventDetailActivity;
-import com.example.bookhub.model.Event;
+import com.example.bookhub.models.Event;
 import java.util.List;
 
 public class EventHomeAdapter extends RecyclerView.Adapter<EventHomeAdapter.ViewHolder> {

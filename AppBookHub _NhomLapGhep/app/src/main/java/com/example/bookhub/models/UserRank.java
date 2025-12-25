@@ -1,4 +1,4 @@
-package com.example.bookhub.model;
+package com.example.bookhub.models;
 import com.google.gson.annotations.SerializedName;
 
 public class UserRank {

@@ -14,10 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.example.bookhub.R;
 import com.example.bookhub.api.RetrofitClient;
-import com.example.bookhub.model.CheckStatusResponse; // Import mới
-import com.example.bookhub.model.RegistrationRequest;
+import com.example.bookhub.models.CheckStatusResponse; // Import mới
+import com.example.bookhub.models.RegistrationRequest;
 import okhttp3.ResponseBody;
-import org.json.JSONObject;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

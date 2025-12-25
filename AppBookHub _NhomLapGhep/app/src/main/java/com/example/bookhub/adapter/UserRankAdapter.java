@@ -2,7 +2,6 @@ package com.example.bookhub.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.example.bookhub.R;
-import com.example.bookhub.model.UserRank;
+import com.example.bookhub.models.UserRank;
 import java.util.List;
 
 public class UserRankAdapter extends RecyclerView.Adapter<UserRankAdapter.ViewHolder> {

@@ -1,9 +1,12 @@
 package com.example.bookhub.api;
 
-import com.example.bookhub.model.Book;
-import com.example.bookhub.model.Event;
-import com.example.bookhub.model.RegistrationRequest;
-import com.example.bookhub.model.CheckStatusResponse;
+import com.example.bookhub.models.Book;
+import com.example.bookhub.models.Event;
+import com.example.bookhub.models.RegisterResponse;
+import com.example.bookhub.models.RegistrationRequest;
+import com.example.bookhub.models.CheckStatusResponse;
+import com.example.bookhub.models.UserRank;
+
 import java.util.List;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -19,8 +22,8 @@ public interface ApiService {
     Call<LoginResponse> login(@Body LoginRequest request);
 
     // Gọi API Đăng ký
-    @POST("api/auth/register")
-    Call<Void> register(@Body RegisterRequest request);
+    @POST("auth/register")
+    Call<RegisterResponse> register(@Body RegisterRequest request);
 
     // Gọi API Lấy sách
     @GET("api/books")
@@ -37,5 +40,5 @@ public interface ApiService {
                                                       @retrofit2.http.Query("eventId") int eventId);
 
     @GET("api/stats/active-readers")
-    Call<List<com.example.bookhub.model.UserRank>> getActiveReaders();
+    Call<List<UserRank>> getActiveReaders();
 }

@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide; // 2. Thêm import Glide
 import com.example.bookhub.R;
-import com.example.bookhub.model.Book;
+import com.example.bookhub.models.Book;
 
 import java.util.List;
 

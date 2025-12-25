@@ -86,19 +86,38 @@ namespace BookHubAPI.Controllers
         [HttpGet("popular")]
         public IActionResult GetPopularBooks()
         {
-            return ExecuteQuery(@"
-                SELECT TOP 6 b.book_id, b.title, b.author, b.average_rating, b.page_count, 
-                       b.current_status, b.price, b.review_count, b.description, 
-                       b.cover_image_url, c.category_name,
-                       COUNT(br.record_id) as borrow_count
-                FROM Books b
-                LEFT JOIN Categories c ON b.category_id = c.category_id
-                LEFT JOIN BorrowRecords br ON b.book_id = br.book_id
-                GROUP BY b.book_id, b.title, b.author, b.average_rating, b.page_count, 
-                         b.current_status, b.price, b.review_count, b.description, 
-                         b.cover_image_url, c.category_name
-                ORDER BY borrow_count DESC
-            ");
+            try
+            {
+                var books = new List<object>();
+                using (SqlConnection conn = new SqlConnection(GetConnectionString()))
+                {
+                    conn.Open();
+
+                    // ✅ Query đơn giản hóa - không JOIN với BorrowRecords để tránh lỗi
+                    string sql = @"
+                        SELECT TOP 6 b.*, c.category_name 
+                        FROM Books b
+                        LEFT JOIN Categories c ON b.category_id = c.category_id
+                        ORDER BY b.book_id DESC
+                    ";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                books.Add(CreateBookObject(reader));
+                            }
+                        }
+                    }
+                }
+                return Ok(books);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi Server: " + ex.Message });
+            }
         }
 
         // ==================== CREATE BOOK ====================
@@ -110,9 +129,30 @@ namespace BookHubAPI.Controllers
                 using (SqlConnection conn = new SqlConnection(GetConnectionString()))
                 {
                     conn.Open();
-                    string sql = @"
+
+                    // ✅ Kiểm tra xem có cột nào trong Books table
+                    string checkColumnSql = @"
+                        SELECT COLUMN_NAME 
+                        FROM INFORMATION_SCHEMA.COLUMNS 
+                        WHERE TABLE_NAME = 'Books' 
+                        AND COLUMN_NAME IN ('image_file', 'cover_image_url')
+                    ";
+
+                    string imageColumnName = "cover_image_url"; // default
+                    using (SqlCommand checkCmd = new SqlCommand(checkColumnSql, conn))
+                    {
+                        using (SqlDataReader reader = checkCmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                imageColumnName = reader["COLUMN_NAME"].ToString();
+                            }
+                        }
+                    }
+
+                    string sql = $@"
                         INSERT INTO Books (title, author, publisher, published_year, page_count, 
-                                         description, price, cover_image_url, category_id, stock_quantity, current_status)
+                                         description, price, {imageColumnName}, category_id, stock_quantity, current_status)
                         VALUES (@title, @author, @publisher, @year, @pages, 
                                 @desc, @price, @img, @catId, @stock, @status);
                         SELECT CAST(SCOPE_IDENTITY() as int);
@@ -163,7 +203,27 @@ namespace BookHubAPI.Controllers
                             return NotFound(new { success = false, message = "Không tìm thấy sách" });
                     }
 
-                    string sql = @"
+                    // ✅ Kiểm tra tên cột image
+                    string checkColumnSql = @"
+                        SELECT COLUMN_NAME 
+                        FROM INFORMATION_SCHEMA.COLUMNS 
+                        WHERE TABLE_NAME = 'Books' 
+                        AND COLUMN_NAME IN ('image_file', 'cover_image_url')
+                    ";
+
+                    string imageColumnName = "cover_image_url"; // default
+                    using (SqlCommand checkCmd = new SqlCommand(checkColumnSql, conn))
+                    {
+                        using (SqlDataReader reader = checkCmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                imageColumnName = reader["COLUMN_NAME"].ToString();
+                            }
+                        }
+                    }
+
+                    string sql = $@"
                         UPDATE Books 
                         SET title = @title, 
                             author = @author, 
@@ -172,7 +232,7 @@ namespace BookHubAPI.Controllers
                             page_count = @pages,
                             description = @desc, 
                             price = @price, 
-                            cover_image_url = @img, 
+                            {imageColumnName} = @img, 
                             category_id = @catId, 
                             stock_quantity = @stock,
                             current_status = @status
@@ -281,38 +341,23 @@ namespace BookHubAPI.Controllers
 
         private object CreateBookObject(SqlDataReader reader)
         {
-            // ✅ FIX: Thử cả 2 tên cột để tương thích
-            string imageColumnName = "cover_image_url";
-
-            // Kiểm tra xem column nào tồn tại
-            bool hasImageFile = false;
-            bool hasCoverImageUrl = false;
-
-            for (int i = 0; i < reader.FieldCount; i++)
-            {
-                string columnName = reader.GetName(i);
-                if (columnName == "image_file") hasImageFile = true;
-                if (columnName == "cover_image_url") hasCoverImageUrl = true;
-            }
-
-            // Ưu tiên cover_image_url, fallback về image_file
-            if (hasCoverImageUrl)
-            {
-                imageColumnName = "cover_image_url";
-            }
-            else if (hasImageFile)
-            {
-                imageColumnName = "image_file";
-            }
-
+            // ✅ Tự động phát hiện tên cột image
             string fileName = "";
             try
             {
-                fileName = reader[imageColumnName] != DBNull.Value ? reader[imageColumnName].ToString() : "";
+                // Thử image_file trước
+                if (HasColumn(reader, "image_file"))
+                {
+                    fileName = reader["image_file"] != DBNull.Value ? reader["image_file"].ToString() : "";
+                }
+                // Nếu không có thì thử cover_image_url
+                else if (HasColumn(reader, "cover_image_url"))
+                {
+                    fileName = reader["cover_image_url"] != DBNull.Value ? reader["cover_image_url"].ToString() : "";
+                }
             }
             catch
             {
-                // Nếu cả 2 đều không có, để trống
                 fileName = "";
             }
 
@@ -343,6 +388,17 @@ namespace BookHubAPI.Controllers
                 categoryId = reader["category_id"] != DBNull.Value ? Convert.ToInt32(reader["category_id"]) : (int?)null,
                 coverImageUrl = fullImageUrl
             };
+        }
+
+        // ✅ Helper method để kiểm tra column có tồn tại không
+        private bool HasColumn(SqlDataReader reader, string columnName)
+        {
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                if (reader.GetName(i).Equals(columnName, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            return false;
         }
     }
 

@@ -17,7 +17,7 @@ namespace BookHubAPI.Controllers
             _configuration = configuration;
         }
 
-        // 1. API LẤY TẤT CẢ SÁCH (Giữ nguyên logic cũ của bạn)
+        // 1. API LẤY TẤT CẢ SÁCH 
         [HttpGet]
         public IActionResult GetAllBooks()
         {
@@ -59,7 +59,7 @@ namespace BookHubAPI.Controllers
             return ExecuteQuery(sql);
         }
 
-        // --- HÀM DÙNG CHUNG (Để đỡ viết lại code kết nối nhiều lần) ---
+        // HÀM DÙNG CHUNG
         private IActionResult ExecuteQuery(string sql)
         {
             var books = new List<object>();

@@ -3,8 +3,8 @@ package com.example.bookhub.api;
 import com.example.bookhub.models.Book;
 import com.example.bookhub.models.BorrowRecord;
 import com.example.bookhub.models.BorrowRequest;
-import com.example.bookhub.models.ActionRequest; // Import cho các hàm trả/hủy
-import com.example.bookhub.models.ActionResponse; // Import cho kết quả trả về
+import com.example.bookhub.models.ActionRequest;
+import com.example.bookhub.models.ActionResponse; 
 import com.example.bookhub.models.CheckStatusResponse;
 import com.example.bookhub.models.Event;
 import com.example.bookhub.models.RegisterResponse;
@@ -85,4 +85,8 @@ public interface ApiService {
     // Lấy chi tiết sách theo ID
     @GET("api/books/detail")
     Call<Book> getBookDetail(@Query("id") int bookId);
+
+    // Gọi API Đặt trước
+    @POST("api/borrow/reserve")
+    Call<ActionResponse> reserveBook(@Body BorrowRequest request);
 }

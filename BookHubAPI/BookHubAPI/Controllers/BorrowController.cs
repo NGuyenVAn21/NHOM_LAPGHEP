@@ -22,9 +22,8 @@ namespace BookHubAPI.Controllers
             return _configuration.GetConnectionString("DefaultConnection");
         }
 
-        // =============================================================
+ 
         // 1. API LẤY DANH SÁCH (GIỮ NGUYÊN)
-        // =============================================================
         [HttpGet("current")]
         public IActionResult GetCurrentBorrows(int userId)
         {
@@ -43,7 +42,7 @@ namespace BookHubAPI.Controllers
             return GetBorrowRecordsByStatus(userId, "Reserved");
         }
 
-        // Hàm chung để query dữ liệu cho gọn
+        // Hàm chung để query dữ liệu
         private IActionResult GetBorrowRecordsByStatus(int userId, string status)
         {
             var list = new List<object>();
@@ -52,7 +51,7 @@ namespace BookHubAPI.Controllers
                 using (SqlConnection conn = new SqlConnection(GetConnectionString()))
                 {
                     conn.Open();
-                    // 1. SỬA SQL: Thêm b.price vào SELECT
+                    // SQL mặc định
                     string sql = @"
                         SELECT br.record_id, br.borrow_date, br.due_date, br.return_date, br.status,
                                b.book_id, b.title, b.author, b.image_file, b.price
@@ -63,7 +62,7 @@ namespace BookHubAPI.Controllers
 
                     if (status == "Borrowing")
                     {
-                        // 1. SỬA SQL: Thêm b.price
+                        // Lấy cả Borrowing và Overdue
                         sql = @"
                         SELECT br.record_id, br.borrow_date, br.due_date, br.return_date, br.status,
                                b.book_id, b.title, b.author, b.image_file, b.price
@@ -72,11 +71,26 @@ namespace BookHubAPI.Controllers
                         WHERE br.user_id = @uid AND (br.status = 'Borrowing' OR br.status = 'Overdue')
                         ORDER BY br.due_date ASC";
                     }
+                    else if (status == "Reserved")
+                    {
+                        // Lấy cả Reserved (Đang chờ) và Ready (Đã có sách)
+                        sql = @"
+                        SELECT br.record_id, br.borrow_date, br.due_date, br.return_date, br.status,
+                               b.book_id, b.title, b.author, b.image_file, b.price
+                        FROM BorrowRecords br
+                        JOIN Books b ON br.book_id = b.book_id
+                        WHERE br.user_id = @uid AND (br.status = 'Reserved' OR br.status = 'Ready')
+                        ORDER BY br.borrow_date DESC";
+                    }
 
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@uid", userId);
-                        cmd.Parameters.AddWithValue("@status", status);
+                        // Chỉ add parameter status nếu không phải trường hợp đặc biệt đã hardcode trong SQL
+                        if (status != "Borrowing" && status != "Reserved")
+                        {
+                            cmd.Parameters.AddWithValue("@status", status);
+                        }
 
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -86,7 +100,6 @@ namespace BookHubAPI.Controllers
                                 if (!string.IsNullOrEmpty(img) && !img.StartsWith("http"))
                                     img = $"{Request.Scheme}://{Request.Host}/images/{img}";
 
-                                // 2. XỬ LÝ GIÁ TIỀN (Format sang VND)
                                 string priceStr = (reader["price"] != DBNull.Value ? Convert.ToDecimal(reader["price"]).ToString("N0") : "0") + " VND";
 
                                 string dbStatus = reader["status"].ToString();
@@ -95,7 +108,8 @@ namespace BookHubAPI.Controllers
                                 string statusColor = "";
 
                                 if (dbStatus == "Returned") { displayStatus = "Đã trả"; statusColor = "#EF5350"; }
-                                else if (dbStatus == "Reserved") { displayStatus = "Sẵn sàng"; statusColor = "#66BB6A"; }
+                                else if (dbStatus == "Reserved") { displayStatus = "Đang chờ"; statusColor = "#FF9800"; }
+                                else if (dbStatus == "Ready") { displayStatus = "Sẵn sàng"; statusColor = "#4CAF50"; }
                                 else
                                 {
                                     if (dueDate < DateTime.Now) { displayStatus = "Quá hạn"; statusColor = "#D32F2F"; }
@@ -115,8 +129,6 @@ namespace BookHubAPI.Controllers
                                     status = dbStatus,
                                     displayStatus = displayStatus,
                                     statusColor = statusColor,
-
-                                    // 3. TRẢ VỀ GIÁ TIỀN
                                     price = priceStr
                                 });
                             }
@@ -128,9 +140,9 @@ namespace BookHubAPI.Controllers
             catch (Exception ex) { return StatusCode(500, new { message = "Lỗi Server: " + ex.Message }); }
         }
 
-        // =============================================================
-        // 2. API MỚI: TẠO YÊU CẦU MƯỢN SÁCH (QUAN TRỌNG)
-        // =============================================================
+
+        // 2. API MƯỢN SÁCH
+ 
         [HttpPost("create")]
         public IActionResult BorrowBook([FromBody] BorrowRequest req)
         {
@@ -140,39 +152,125 @@ namespace BookHubAPI.Controllers
                 {
                     conn.Open();
 
-                    // Bước 1: Kiểm tra xem sách còn trong kho không
-                    string checkStockSql = "SELECT stock_quantity FROM Books WHERE book_id = @bid";
-                    using (SqlCommand cmdCheck = new SqlCommand(checkStockSql, conn))
+                    // --- CHECK 1: Giới hạn mỗi người chỉ được mượn tối đa 5 cuốn ---
+                    string limitSql = "SELECT COUNT(*) FROM BorrowRecords WHERE user_id = @uid AND status IN ('Borrowing', 'Overdue', 'Ready')";
+                    using (SqlCommand cmd = new SqlCommand(limitSql, conn))
                     {
-                        cmdCheck.Parameters.AddWithValue("@bid", req.BookId);
-                        object result = cmdCheck.ExecuteScalar();
+                        cmd.Parameters.AddWithValue("@uid", req.UserId);
+                        int count = (int)cmd.ExecuteScalar();
+                        if (count >= 5) return BadRequest(new { success = false, message = "Bạn chỉ được mượn tối đa 5 cuốn cùng lúc!" });
+                    }
 
-                        if (result == null) return NotFound(new { success = false, message = "Sách không tồn tại." });
+                    // --- CHECK 2: Kiểm tra xem User này có đang được giữ chỗ (Ready) không? ---
+                    bool isClaimingReservation = false;
+                    string checkReadySql = "SELECT COUNT(*) FROM BorrowRecords WHERE user_id = @uid AND book_id = @bid AND status = 'Ready'";
+                    using (SqlCommand cmd = new SqlCommand(checkReadySql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@uid", req.UserId);
+                        cmd.Parameters.AddWithValue("@bid", req.BookId);
+                        if ((int)cmd.ExecuteScalar() > 0) isClaimingReservation = true;
+                    }
 
-                        int stock = Convert.ToInt32(result);
-                        if (stock <= 0)
+                    // --- CHECK 3: Kiểm tra tồn kho (Nếu KHÔNG phải là người được giữ chỗ) ---
+                    if (!isClaimingReservation)
+                    {
+                        string stockSql = "SELECT stock_quantity FROM Books WHERE book_id = @bid";
+                        using (SqlCommand cmd = new SqlCommand(stockSql, conn))
                         {
-                            return BadRequest(new { success = false, message = "Sách này hiện đã hết hàng!" });
+                            cmd.Parameters.AddWithValue("@bid", req.BookId);
+                            object result = cmd.ExecuteScalar();
+                            if (result == null || Convert.ToInt32(result) <= 0)
+                                return BadRequest(new { success = false, message = "Sách đã hết hàng, vui lòng Đặt trước!" });
                         }
                     }
 
-                    // Bước 2: Kiểm tra xem user này có đang mượn cuốn này chưa trả không (tránh spam)
-                    string checkDupSql = "SELECT COUNT(*) FROM BorrowRecords WHERE user_id = @uid AND book_id = @bid AND status IN ('Borrowing', 'Overdue')";
-                    using (SqlCommand cmdDup = new SqlCommand(checkDupSql, conn))
+                    // --- CHECK 4: Tránh mượn trùng (Nếu đang Ready thì cho qua để update) ---
+                    if (!isClaimingReservation)
                     {
-                        cmdDup.Parameters.AddWithValue("@uid", req.UserId);
-                        cmdDup.Parameters.AddWithValue("@bid", req.BookId);
-                        int count = (int)cmdDup.ExecuteScalar();
-                        if (count > 0)
+                        string dupSql = "SELECT COUNT(*) FROM BorrowRecords WHERE user_id = @uid AND book_id = @bid AND status IN ('Borrowing', 'Overdue')";
+                        using (SqlCommand cmd = new SqlCommand(dupSql, conn))
                         {
-                            return BadRequest(new { success = false, message = "Bạn đang mượn cuốn sách này rồi!" });
+                            cmd.Parameters.AddWithValue("@uid", req.UserId);
+                            cmd.Parameters.AddWithValue("@bid", req.BookId);
+                            if ((int)cmd.ExecuteScalar() > 0) return BadRequest(new { success = false, message = "Bạn đang giữ cuốn sách này rồi." });
                         }
                     }
 
-                    // Bước 3: Insert vào BorrowRecords -> Trigger trg_BorrowBook sẽ tự động trừ kho
-                    string sql = @"INSERT INTO BorrowRecords (user_id, book_id, borrow_date, due_date, status) 
-                                   VALUES (@uid, @bid, GETDATE(), DATEADD(day, 14, GETDATE()), 'Borrowing')";
+                    // --- THỰC HIỆN MƯỢN ---
+                    if (isClaimingReservation)
+                    {
+                        // Nếu đang Ready (đã xếp hàng thành công) -> Update thành Borrowing (Không cần trừ kho vì kho đã giữ cho người này)
+                        string sqlUpdate = "UPDATE BorrowRecords SET status = 'Borrowing', borrow_date = GETDATE(), due_date = DATEADD(day, 14, GETDATE()) WHERE user_id = @uid AND book_id = @bid AND status = 'Ready'";
+                        using (SqlCommand cmd = new SqlCommand(sqlUpdate, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@uid", req.UserId);
+                            cmd.Parameters.AddWithValue("@bid", req.BookId);
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                    else
+                    {
+                        // Mượn mới hoàn toàn -> Insert và Trừ kho
+                        string sqlInsert = "INSERT INTO BorrowRecords (user_id, book_id, borrow_date, due_date, status) VALUES (@uid, @bid, GETDATE(), DATEADD(day, 14, GETDATE()), 'Borrowing')";
+                        using (SqlCommand cmd = new SqlCommand(sqlInsert, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@uid", req.UserId);
+                            cmd.Parameters.AddWithValue("@bid", req.BookId);
+                            cmd.ExecuteNonQuery();
+                        }
 
+                        // Trừ kho
+                        string sqlStock = "UPDATE Books SET stock_quantity = stock_quantity - 1 WHERE book_id = @bid";
+                        using (SqlCommand cmd = new SqlCommand(sqlStock, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@bid", req.BookId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // Cập nhật trạng thái hiển thị nếu kho về 0
+                        string sqlStatus = "UPDATE Books SET current_status = N'Hết hàng' WHERE book_id = @bid AND stock_quantity <= 0";
+                        using (SqlCommand cmd = new SqlCommand(sqlStatus, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@bid", req.BookId);
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+                return Ok(new { success = true, message = "Mượn sách thành công! Hạn trả là 14 ngày." });
+            }
+            catch (Exception ex) { return StatusCode(500, new { success = false, message = ex.Message }); }
+        }
+        // 3. API ĐẶT TRƯỚC (RESERVE)
+ 
+        [HttpPost("reserve")]
+        public IActionResult ReserveBook([FromBody] BorrowRequest req)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(GetConnectionString()))
+                {
+                    conn.Open();
+
+                    // Check: Chỉ cho đặt nếu sách HẾT hàng
+                    string stockSql = "SELECT stock_quantity FROM Books WHERE book_id = @bid";
+                    using (SqlCommand cmd = new SqlCommand(stockSql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@bid", req.BookId);
+                        int stock = (int)cmd.ExecuteScalar();
+                        if (stock > 0) return BadRequest(new { success = false, message = "Sách đang có sẵn, bạn hãy bấm Mượn sách!" });
+                    }
+
+                    // Check: Đã đặt trước đó chưa?
+                    string dupSql = "SELECT COUNT(*) FROM BorrowRecords WHERE user_id = @uid AND book_id = @bid AND status IN ('Reserved', 'Ready')";
+                    using (SqlCommand cmd = new SqlCommand(dupSql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@uid", req.UserId);
+                        cmd.Parameters.AddWithValue("@bid", req.BookId);
+                        if ((int)cmd.ExecuteScalar() > 0) return BadRequest(new { success = false, message = "Bạn đã đặt trước cuốn này rồi." });
+                    }
+
+                    // Insert Reserved
+                    string sql = "INSERT INTO BorrowRecords (user_id, book_id, borrow_date, due_date, status) VALUES (@uid, @bid, GETDATE(), GETDATE(), 'Reserved')";
                     using (SqlCommand cmd = new SqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@uid", req.UserId);
@@ -180,22 +278,17 @@ namespace BookHubAPI.Controllers
                         cmd.ExecuteNonQuery();
                     }
                 }
-                return Ok(new { success = true, message = "Mượn sách thành công! Hạn trả là 14 ngày." });
+                return Ok(new { success = true, message = "Đã vào danh sách chờ! Chúng tôi sẽ báo khi có sách." });
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
+            catch (Exception ex) { return StatusCode(500, new { success = false, message = ex.Message }); }
         }
 
-        // =============================================================
-        // 3. CÁC API HÀNH ĐỘNG KHÁC (GIỮ NGUYÊN)
-        // =============================================================
+        // 4. API HÀNH ĐỘNG KHÁC (GIỮ NGUYÊN)
+
 
         [HttpPost("return")]
         public IActionResult ReturnBook([FromBody] ActionRequest req)
         {
-
             try
             {
                 using (SqlConnection conn = new SqlConnection(GetConnectionString()))
@@ -222,7 +315,6 @@ namespace BookHubAPI.Controllers
         [HttpPost("extend")]
         public IActionResult ExtendBook([FromBody] ActionRequest req)
         {
-            // ... (Code cũ giữ nguyên)
             try
             {
                 using (SqlConnection conn = new SqlConnection(GetConnectionString()))
@@ -278,7 +370,6 @@ namespace BookHubAPI.Controllers
         public int UserId { get; set; }
     }
 
-    // Class mới cho API BorrowBook
     public class BorrowRequest
     {
         public int UserId { get; set; }

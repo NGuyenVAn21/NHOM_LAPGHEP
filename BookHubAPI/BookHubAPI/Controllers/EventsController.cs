@@ -25,39 +25,40 @@ namespace BookHubAPI.Controllers
 
             if (mobileFormat == true)
             {
-                // Format cho Mobile App
-                var mobileEvents = await query
+                // Format cho Mobile App - ✅ FIX: Fetch data trước, transform sau
+                var events = await query
                     .Where(e => e.IsActive)
-                    .Select(e => new
-                    {
-                        id = e.EventId,
-                        title = e.Title,
-                        description = e.Description ?? "",
-                        startDate = e.StartDate != null ? e.StartDate.Value.ToString("dd/MM/yyyy") : "",
-                        endDate = e.EndDate != null ? e.EndDate.Value.ToString("dd/MM/yyyy") : "",
-                        imageUrl = GetFullImageUrl(e.ImageBannerUrl)
-                    })
                     .ToListAsync();
+
+                var mobileEvents = events.Select(e => new
+                {
+                    id = e.EventId,
+                    title = e.Title,
+                    description = e.Description ?? "",
+                    startDate = e.StartDate != null ? e.StartDate.Value.ToString("dd/MM/yyyy") : "",
+                    endDate = e.EndDate != null ? e.EndDate.Value.ToString("dd/MM/yyyy") : "",
+                    imageUrl = GetFullImageUrl(e.ImageBannerUrl, Request)
+                }).ToList();
 
                 return Ok(mobileEvents);
             }
             else
             {
-                // Format cho Admin Panel
-                var events = await query
-                    .Select(e => new
-                    {
-                        eventId = e.EventId,
-                        title = e.Title,
-                        description = e.Description,
-                        startDate = e.StartDate,
-                        endDate = e.EndDate,
-                        imageBannerUrl = GetFullImageUrl(e.ImageBannerUrl),
-                        isActive = e.IsActive
-                    })
-                    .ToListAsync();
+                // Format cho Admin Panel - ✅ FIX: Fetch data trước, transform sau
+                var events = await query.ToListAsync();
 
-                return Ok(events);
+                var adminEvents = events.Select(e => new
+                {
+                    eventId = e.EventId,
+                    title = e.Title,
+                    description = e.Description,
+                    startDate = e.StartDate,
+                    endDate = e.EndDate,
+                    imageBannerUrl = GetFullImageUrl(e.ImageBannerUrl, Request),
+                    isActive = e.IsActive
+                }).ToList();
+
+                return Ok(adminEvents);
             }
         }
 
@@ -114,24 +115,26 @@ namespace BookHubAPI.Controllers
         [HttpGet("my-registrations")]
         public async Task<ActionResult> GetMyRegistrations([FromQuery] int userId)
         {
+            // ✅ FIX: Fetch data trước, transform sau
             var registrations = await _context.EventRegistrations
                 .Include(er => er.Event)
                 .Where(er => er.UserId == userId)
-                .Select(er => new
-                {
-                    registrationId = er.RegistrationId,
-                    eventId = er.EventId,
-                    title = er.Event!.Title,
-                    description = er.Event.Description ?? "",
-                    startDate = er.Event.StartDate != null ? er.Event.StartDate.Value.ToString("dd/MM/yyyy") : "",
-                    endDate = er.Event.EndDate != null ? er.Event.EndDate.Value.ToString("dd/MM/yyyy") : "",
-                    imageUrl = GetFullImageUrl(er.Event.ImageBannerUrl),
-                    status = er.Status,
-                    registeredAt = er.RegisteredAt.ToString("dd/MM/yyyy")
-                })
                 .ToListAsync();
 
-            return Ok(registrations);
+            var result = registrations.Select(er => new
+            {
+                registrationId = er.RegistrationId,
+                eventId = er.EventId,
+                title = er.Event!.Title,
+                description = er.Event.Description ?? "",
+                startDate = er.Event.StartDate != null ? er.Event.StartDate.Value.ToString("dd/MM/yyyy") : "",
+                endDate = er.Event.EndDate != null ? er.Event.EndDate.Value.ToString("dd/MM/yyyy") : "",
+                imageUrl = GetFullImageUrl(er.Event.ImageBannerUrl, Request),
+                status = er.Status,
+                registeredAt = er.RegisteredAt.ToString("dd/MM/yyyy")
+            }).ToList();
+
+            return Ok(result);
         }
 
         // ==================== ADMIN ENDPOINTS ====================
@@ -212,8 +215,8 @@ namespace BookHubAPI.Controllers
         }
 
         // ==================== HELPER METHODS ====================
-
-        private string GetFullImageUrl(string? fileName)
+        // ✅ FIX: Đổi thành static method và nhận HttpRequest làm parameter
+        private static string GetFullImageUrl(string? fileName, HttpRequest request)
         {
             if (string.IsNullOrEmpty(fileName))
                 return "";
@@ -221,7 +224,7 @@ namespace BookHubAPI.Controllers
             if (fileName.StartsWith("http"))
                 return fileName;
 
-            return $"{Request.Scheme}://{Request.Host}/images/{fileName}";
+            return $"{request.Scheme}://{request.Host}/images/{fileName}";
         }
     }
 

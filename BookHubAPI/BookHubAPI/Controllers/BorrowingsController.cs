@@ -33,12 +33,12 @@ namespace BookHubAPI.Controllers
                 {
                     conn.Open();
 
-                    // Base query
+                    // Base query - ✅ FIX: Dùng cover_image_url thay vì image_file
                     string sql = @"
                         SELECT br.record_id, br.user_id, br.book_id, br.borrow_date, 
                                br.due_date, br.return_date, br.status,
                                u.full_name, u.email, u.avatar_url,
-                               b.title, b.author, b.image_file
+                               b.title, b.author, b.cover_image_url
                         FROM BorrowRecords br
                         JOIN Users u ON br.user_id = u.user_id
                         JOIN Books b ON br.book_id = b.book_id
@@ -70,8 +70,8 @@ namespace BookHubAPI.Controllers
                                     avatarUrl = $"{Request.Scheme}://{Request.Host}/images/{avatarUrl}";
                                 }
 
-                                // Process book cover
-                                string coverUrl = reader["image_file"] != DBNull.Value ? reader["image_file"].ToString() : "";
+                                // Process book cover - ✅ FIX: Dùng cover_image_url
+                                string coverUrl = reader["cover_image_url"] != DBNull.Value ? reader["cover_image_url"].ToString() : "";
                                 if (!string.IsNullOrEmpty(coverUrl) && !coverUrl.StartsWith("http"))
                                 {
                                     coverUrl = $"{Request.Scheme}://{Request.Host}/images/{coverUrl}";

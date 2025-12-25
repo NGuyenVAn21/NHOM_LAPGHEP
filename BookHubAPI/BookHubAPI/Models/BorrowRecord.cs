@@ -30,5 +30,7 @@ namespace BookHubAPI.Models
 
         public User? User { get; set; }
         public Book? Book { get; set; }
+        [Column("image_file")]  // ✅ Đổi từ cover_image_url sang image_file
+        public string? CoverImageUrl { get; set; }
     }
 }

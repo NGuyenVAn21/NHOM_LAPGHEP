@@ -19,7 +19,8 @@ namespace BookHubAPI.Controllers
         [HttpGet("active-readers")]
         public async Task<ActionResult> GetActiveReaders()
         {
-            var users = await _context.Users
+            // ✅ FIX: Fetch data trước, transform sau
+            var usersWithBorrowCount = await _context.Users
                 .Select(u => new
                 {
                     User = u,
@@ -27,16 +28,17 @@ namespace BookHubAPI.Controllers
                 })
                 .OrderByDescending(x => x.TotalBorrow)
                 .Take(5)
-                .Select(x => new
-                {
-                    id = x.User.UserId,
-                    name = x.User.FullName,
-                    avatar = GetFullImageUrl(x.User.AvatarUrl),
-                    borrowCount = x.TotalBorrow
-                })
                 .ToListAsync();
 
-            return Ok(users);
+            var result = usersWithBorrowCount.Select(x => new
+            {
+                id = x.User.UserId,
+                name = x.User.FullName,
+                avatar = GetFullImageUrl(x.User.AvatarUrl, Request),
+                borrowCount = x.TotalBorrow
+            }).ToList();
+
+            return Ok(result);
         }
 
         // GET: api/stats/user-summary?userId=1 (Mobile - Thống kê của 1 user)
@@ -73,7 +75,7 @@ namespace BookHubAPI.Controllers
             var activeEvents = await _context.Events.CountAsync(e => e.IsActive);
 
             // Top 5 sách được mượn nhiều nhất
-            var topBooks = await _context.BorrowRecords
+            var topBooksData = await _context.BorrowRecords
                 .GroupBy(br => br.BookId)
                 .Select(g => new
                 {
@@ -82,17 +84,23 @@ namespace BookHubAPI.Controllers
                 })
                 .OrderByDescending(x => x.BorrowCount)
                 .Take(5)
-                .Join(_context.Books,
-                    x => x.BookId,
-                    b => b.BookId,
-                    (x, b) => new
-                    {
-                        bookId = b.BookId,
-                        title = b.Title,
-                        author = b.Author,
-                        borrowCount = x.BorrowCount
-                    })
                 .ToListAsync();
+
+            var topBooks = new List<object>();
+            foreach (var item in topBooksData)
+            {
+                var book = await _context.Books.FindAsync(item.BookId);
+                if (book != null)
+                {
+                    topBooks.Add(new
+                    {
+                        bookId = book.BookId,
+                        title = book.Title,
+                        author = book.Author,
+                        borrowCount = item.BorrowCount
+                    });
+                }
+            }
 
             return Ok(new
             {
@@ -165,8 +173,8 @@ namespace BookHubAPI.Controllers
         }
 
         // ==================== HELPER METHODS ====================
-
-        private string GetFullImageUrl(string? fileName)
+        // ✅ FIX: Đổi thành static method và nhận HttpRequest làm parameter
+        private static string GetFullImageUrl(string? fileName, HttpRequest request)
         {
             if (string.IsNullOrEmpty(fileName))
                 return "";
@@ -174,7 +182,7 @@ namespace BookHubAPI.Controllers
             if (fileName.StartsWith("http"))
                 return fileName;
 
-            return $"{Request.Scheme}://{Request.Host}/images/{fileName}";
+            return $"{request.Scheme}://{request.Host}/images/{fileName}";
         }
     }
 }

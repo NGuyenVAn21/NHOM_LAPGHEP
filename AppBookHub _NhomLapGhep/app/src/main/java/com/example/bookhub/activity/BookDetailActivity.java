@@ -29,7 +29,7 @@ import retrofit2.Response;
 public class BookDetailActivity extends AppCompatActivity {
 
     private ImageView favoriteButton, bookCover;
-    private Button borrowButton, cartButton, readButton;
+    private Button borrowButton, readButton;
     private boolean isFavorite = false;
     private Book currentBook;
 
@@ -53,7 +53,6 @@ public class BookDetailActivity extends AppCompatActivity {
     private void initViews() {
         favoriteButton = findViewById(R.id.favoriteButton);
         borrowButton = findViewById(R.id.borrowButton);
-        cartButton = findViewById(R.id.cartButton);
         readButton = findViewById(R.id.readButton);
         bookCover = findViewById(R.id.bookImage);
     }
@@ -101,7 +100,6 @@ public class BookDetailActivity extends AppCompatActivity {
             borrowButton.setText("Mượn sách");
             borrowButton.setBackgroundColor(getColor(R.color.purple_500));
             borrowButton.setVisibility(View.VISIBLE);
-            cartButton.setVisibility(View.VISIBLE);
 
             borrowButton.setOnClickListener(v -> performBorrowBook());
         } else {
@@ -109,7 +107,6 @@ public class BookDetailActivity extends AppCompatActivity {
             borrowButton.setText("Đặt trước");
             borrowButton.setBackgroundColor(Color.parseColor("#FF9800")); // Màu Cam
             borrowButton.setVisibility(View.VISIBLE);
-            cartButton.setVisibility(View.GONE); // Hết hàng thì ẩn giỏ
 
             borrowButton.setOnClickListener(v -> performReserveBook());
         }
@@ -118,7 +115,6 @@ public class BookDetailActivity extends AppCompatActivity {
     private void setupClickListeners() {
         findViewById(R.id.backButton).setOnClickListener(v -> finish());
         favoriteButton.setOnClickListener(v -> toggleFavorite());
-        cartButton.setOnClickListener(v -> showToast("Đã thêm vào giỏ hàng"));
         readButton.setOnClickListener(v -> {
             if (currentBook != null) {
                 Intent intent = new Intent(BookDetailActivity.this, ReadingActivity.class);

@@ -120,8 +120,12 @@ public class BookDetailActivity extends AppCompatActivity {
         favoriteButton.setOnClickListener(v -> toggleFavorite());
         cartButton.setOnClickListener(v -> showToast("Đã thêm vào giỏ hàng"));
         readButton.setOnClickListener(v -> {
-            Intent intent = new Intent(BookDetailActivity.this, ReadingActivity.class);
-            startActivity(intent);
+            if (currentBook != null) {
+                Intent intent = new Intent(BookDetailActivity.this, ReadingActivity.class);
+                intent.putExtra("BOOK_ID", currentBook.getId());
+                intent.putExtra("BOOK_TITLE", currentBook.getTitle());
+                startActivity(intent);
+            }
         });
     }
 

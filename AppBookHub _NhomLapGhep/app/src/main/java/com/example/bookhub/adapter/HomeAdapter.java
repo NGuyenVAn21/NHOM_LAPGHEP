@@ -17,6 +17,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.BookHomeViewHo
     private List<Book> books;
     private OnItemClickListener onItemClickListener;
 
+    // Interface để nhận sự kiện click
     public interface OnItemClickListener {
         void onItemClick(Book book);
     }
@@ -29,7 +30,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.BookHomeViewHo
     @NonNull
     @Override
     public BookHomeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Dùng layout item_book_home (thẻ nhỏ) thay vì item_book (thẻ to)
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_book_home, parent, false);
         return new BookHomeViewHolder(view);
     }
@@ -40,20 +40,24 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.BookHomeViewHo
         holder.title.setText(book.getTitle());
         holder.author.setText(book.getAuthor());
 
-        // --- SỬA ĐOẠN NÀY ---
         String imageUrl = book.getImageUrl();
-
-        // Kiểm tra: Nếu chỉ là tên file (không có http) thì ghép thêm link server
         if (imageUrl != null && !imageUrl.startsWith("http")) {
-            // Thay 5177 bằng cổng API của bạn
+            // Đổi 10.0.2.2 thành IP máy tính nếu chạy trên điện thoại thật
             imageUrl = "http://10.0.2.2:5280/images/" + imageUrl;
         }
 
         Glide.with(holder.itemView.getContext())
                 .load(imageUrl)
-                .placeholder(R.drawable.ic_menu_book_round) // Ảnh chờ
-                .error(R.drawable.ic_menu_book_round)       // Ảnh lỗi
+                .placeholder(R.drawable.ic_menu_book_round)
+                .error(R.drawable.ic_menu_book_round)
                 .into(holder.cover);
+
+        // --- SỬA LỖI: Bắt sự kiện click vào item sách ---
+        holder.itemView.setOnClickListener(v -> {
+            if (onItemClickListener != null) {
+                onItemClickListener.onItemClick(book);
+            }
+        });
     }
 
     @Override

@@ -120,6 +120,11 @@
             android:exported="false"
             android:label="" />
 
+        <activity
+            android:name=".activity.MyEventsActivity"
+            android:exported="false"
+            android:label="" />
+
     </application>
 
 </manifest>

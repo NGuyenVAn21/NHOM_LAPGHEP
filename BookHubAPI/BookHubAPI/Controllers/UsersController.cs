@@ -108,6 +108,49 @@ namespace BookHubAPI.Controllers
             }
             catch (Exception ex) { return StatusCode(500, ex.Message); }
         }
+
+        // 4. LẤY DANH SÁCH SÁCH ĐÃ ĐÁNH GIÁ (GET /api/users/{id}/reviews)
+        [HttpGet("{id}/reviews")]
+        public IActionResult GetUserReviews(int id)
+        {
+            var list = new List<object>();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(GetConnectionString()))
+                {
+                    conn.Open();
+                    string sql = @"SELECT r.rating, r.comment, r.created_at, b.title, b.image_file 
+                                   FROM Reviews r 
+                                   JOIN Books b ON r.book_id = b.book_id 
+                                   WHERE r.user_id = @uid ORDER BY r.created_at DESC";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@uid", id);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                string img = reader["image_file"] != DBNull.Value ? reader["image_file"].ToString() : "";
+                                if (!string.IsNullOrEmpty(img) && !img.StartsWith("http"))
+                                    img = $"{Request.Scheme}://{Request.Host}/images/{img}";
+
+                                list.Add(new
+                                {
+                                    bookTitle = reader["title"],
+                                    rating = Convert.ToInt32(reader["rating"]),
+                                    comment = reader["comment"].ToString(),
+                                    date = Convert.ToDateTime(reader["created_at"]).ToString("dd/MM/yyyy"),
+                                    image = img
+                                });
+                            }
+                        }
+                    }
+                }
+                return Ok(list);
+            }
+            catch (Exception ex) { return StatusCode(500, ex.Message); }
+        }
     }
 
     // --- DTO CLASSES ---

@@ -59,6 +59,52 @@ namespace BookHubAPI.Controllers
             return ExecuteQuery(sql);
         }
 
+        // 4. API LẤY NỘI DUNG SÁCH (CHƯƠNG)
+        // GET: api/books/{id}/chapters
+        [HttpGet("{id}/chapters")]
+        public IActionResult GetBookChapters(int id)
+        {
+            var chapters = new List<object>();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    conn.Open();
+                    // Lấy các chương, sắp xếp theo thứ tự chapter_num
+                    string sql = "SELECT chapter_id, chapter_num, title, content FROM Chapters WHERE book_id = @bid ORDER BY chapter_num ASC";
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@bid", id);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                chapters.Add(new
+                                {
+                                    chapterId = reader["chapter_id"],
+                                    chapterNum = reader["chapter_num"],
+                                    title = reader["title"].ToString(),
+                                    content = reader["content"].ToString()
+                                });
+                            }
+                        }
+                    }
+                }
+
+                if (chapters.Count == 0)
+                {
+                    return NotFound(new { message = "Sách này chưa có nội dung." });
+                }
+
+                return Ok(chapters);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Lỗi Server: " + ex.Message);
+            }
+        }
+
         // HÀM DÙNG CHUNG
         private IActionResult ExecuteQuery(string sql)
         {

@@ -3,92 +3,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F7FA">
+    android:padding="20dp"
+    android:background="#FFF">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
+    <TextView
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:padding="16dp"
-        android:elevation="2dp">
+        android:layout_width="wrap_content"
+        android:text="Chỉnh sửa hồ sơ"
+        android:textSize="22sp"
+        :textStyle="bold"
+        android:layout_marginBottom="20dp"/>
 
-        <ImageView
-            android:id="@+id/btn_back_edit_profile"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_arrow_back"
-            android:layout_centerVertical="true"/>
+    <EditText android:id="@+id/etEditFullname" android:hint="Họ và tên" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp"/>
+    <EditText android:id="@+id/etEditEmail" android:hint="Email" android:inputType="textEmailAddress" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:layout_marginTop="10dp"/>
+    <EditText android:id="@+id/etEditPhone" android:hint="Số điện thoại" android:inputType="phone" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:layout_marginTop="10dp"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Chỉnh sửa hồ sơ"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_centerInParent="true"
-            android:textColor="@color/black_app"/>
-    </RelativeLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Họ và tên"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
-        <EditText
-            android:id="@+id/et_edit_fullname"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_search_input"
-            android:paddingHorizontal="12dp"
-            android:hint="Nhập họ tên mới"
-            android:layout_marginBottom="16dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Email"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
-        <EditText
-            android:id="@+id/et_edit_email"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_search_input"
-            android:paddingHorizontal="12dp"
-            android:hint="Nhập email"
-            android:inputType="textEmailAddress"
-            android:layout_marginBottom="16dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Số điện thoại"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
-        <EditText
-            android:id="@+id/et_edit_phone"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_search_input"
-            android:paddingHorizontal="12dp"
-            android:hint="Nhập số điện thoại"
-            android:inputType="phone"
-            android:layout_marginBottom="32dp"/>
-
-        <Button
-            android:id="@+id/btn_save_profile"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:text="Lưu thay đổi"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:backgroundTint="@color/primary_color"/>
-    </LinearLayout>
+    <Button android:id="@+id/btnSaveProfile" android:text="Lưu thay đổi" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="30dp" android:backgroundTint="#4CAF50"/>
 </LinearLayout>

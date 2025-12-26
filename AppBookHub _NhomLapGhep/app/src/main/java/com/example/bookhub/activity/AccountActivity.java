@@ -53,27 +53,24 @@ public class AccountActivity extends AppCompatActivity {
         tvStatRead = findViewById(R.id.tvStatRead);         // Số sách đã đọc
         tvStatDays = findViewById(R.id.tvStatDays);         // Số ngày đọc
 
-        // 3. Load dữ liệu
-        updateUserInfo();   // Hiển thị tên từ bộ nhớ
-        fetchProfileStats(); // Gọi API lấy số liệu thống kê
+        updateUserInfo();
+        fetchProfileStats();
 
-        /* ---------------------------------------------------
-         * 4. SETUP MENU SỔ XUỐNG
-         * --------------------------------------------------- */
         setupExpandableMenus();
 
-        /* ---------------------------------------------------
-         * 5. SETUP CÁC NÚT CHUYỂN TRANG
-         * --------------------------------------------------- */
+        View itemMyEvents = findViewById(R.id.itemMyEvents);
+        if (itemMyEvents != null) {
+            itemMyEvents.setOnClickListener(v ->
+                    startActivity(new Intent(AccountActivity.this, MyEventsActivity.class))
+            );
+        }
+
         setupActionButtons();
 
-        // Nút Đổi mật khẩu -> Hiện Dialog
         findViewById(R.id.subPassword).setOnClickListener(v -> showChangePasswordDialog());
 
-        // Nút Đăng xuất -> Gọi hàm Logout
         findViewById(R.id.itemLogout).setOnClickListener(v -> performLogout());
 
-        // Nút Chỉnh sửa hồ sơ
         findViewById(R.id.btnEditProfile).setOnClickListener(v ->
                 startActivity(new Intent(AccountActivity.this, EditProfileActivity.class)));
     }

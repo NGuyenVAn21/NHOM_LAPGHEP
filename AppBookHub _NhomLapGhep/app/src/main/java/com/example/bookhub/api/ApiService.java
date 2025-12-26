@@ -29,14 +29,14 @@ import retrofit2.http.Query;
 
 public interface ApiService {
 
-    // --- AUTH (ĐĂNG NHẬP / ĐĂNG KÝ) ---
+    // --- AUTH ---
     @POST("api/auth/login")
     Call<LoginResponse> login(@Body LoginRequest request);
 
     @POST("api/auth/register")
     Call<RegisterResponse> register(@Body RegisterRequest request);
 
-    // --- BOOKS (SÁCH) ---
+    // --- BOOKS ---
     @GET("api/books")
     Call<List<Book>> getAllBooks();
 
@@ -46,21 +46,34 @@ public interface ApiService {
     @GET("api/books/popular")
     Call<List<Book>> getPopularBooks();
 
-    // Lấy chi tiết sách theo ID
     @GET("api/books/detail")
     Call<Book> getBookDetail(@Query("id") int bookId);
 
-    // --- EVENTS (SỰ KIỆN) ---
+    @GET("api/books/{id}/chapters")
+    Call<List<com.example.bookhub.models.Chapter>> getBookChapters(@Path("id") int bookId);
+
+    // --- EVENTS (Đã bổ sung đầy đủ) ---
     @GET("api/events")
     Call<List<Event>> getAllEvents();
+
+    // API MỚI: Lấy danh sách sự kiện User đã đăng ký
+    @GET("api/events/my-events")
+    Call<List<Event>> getMyEvents(@Query("userId") int userId);
 
     @POST("api/events/register")
     Call<ResponseBody> registerEvent(@Body RegistrationRequest request);
 
+    // API MỚI: Hủy đăng ký
+    @POST("api/events/cancel")
+    Call<ResponseBody> cancelEventRegistration(@Body RegistrationRequest request);
+
     @GET("api/events/check-status")
     Call<CheckStatusResponse> checkRegistrationStatus(@Query("userId") int userId, @Query("eventId") int eventId);
 
-    // --- STATS (THỐNG KÊ) ---
+    @GET("api/users/{id}/reviews")
+    Call<List<com.example.bookhub.models.UserReview>> getUserReviews(@Path("id") int userId);
+
+    // --- STATS ---
     @GET("api/stats/active-readers")
     Call<List<UserRank>> getActiveReaders();
 
@@ -70,9 +83,7 @@ public interface ApiService {
     @GET("api/stats/profile-stats")
     Call<ProfileStatsResponse> getProfileStats(@Query("userId") int userId);
 
-    // --- BORROW (MƯỢN / TRẢ / ĐẶT TRƯỚC SÁCH) ---
-
-    // 1. Lấy danh sách lịch sử/hiện tại
+    // --- BORROW ---
     @GET("api/borrow/current")
     Call<List<BorrowRecord>> getCurrentBorrows(@Query("userId") int userId);
 
@@ -82,7 +93,6 @@ public interface ApiService {
     @GET("api/borrow/reservations")
     Call<List<BorrowRecord>> getReservations(@Query("userId") int userId);
 
-    // 2. Các hành động (Tạo mới, Trả, Gia hạn, Hủy)
     @POST("api/borrow/create")
     Call<ActionResponse> borrowBook(@Body BorrowRequest request);
 
@@ -98,16 +108,13 @@ public interface ApiService {
     @POST("api/borrow/reserve")
     Call<ActionResponse> reserveBook(@Body BorrowRequest request);
 
-    // --- USER PROFILE (NGƯỜI DÙNG) ---
+    // --- USER ---
     @GET("api/users/{id}")
     Call<UserDetail> getUserProfile(@Path("id") int id);
 
-    // Cập nhật thông tin
     @PUT("api/users/{id}")
     Call<ResponseBody> updateProfile(@Path("id") int id, @Body UpdateProfileRequest request);
 
-    // Đổi mật khẩu
     @POST("api/users/change-password")
     Call<ResponseBody> changePassword(@Body ChangePasswordRequest request);
-
 }

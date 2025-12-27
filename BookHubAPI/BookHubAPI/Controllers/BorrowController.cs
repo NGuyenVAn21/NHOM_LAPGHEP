@@ -286,6 +286,7 @@ namespace BookHubAPI.Controllers
         // 4. API HÀNH ĐỘNG KHÁC (GIỮ NGUYÊN)
 
 
+        // POST: api/borrow/return
         [HttpPost("return")]
         public IActionResult ReturnBook([FromBody] ActionRequest req)
         {
@@ -294,19 +295,80 @@ namespace BookHubAPI.Controllers
                 using (SqlConnection conn = new SqlConnection(GetConnectionString()))
                 {
                     conn.Open();
-                    string sql = @"UPDATE BorrowRecords 
-                                   SET status = 'Returned', return_date = GETDATE() 
-                                   WHERE record_id = @rid AND user_id = @uid AND (status = 'Borrowing' OR status = 'Overdue')";
 
-                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    // BƯỚC 1: Lấy book_id của cuốn sách đang trả (Để check đặt trước)
+                    int bookId = 0;
+                    string getBookSql = "SELECT book_id FROM BorrowRecords WHERE record_id = @rid";
+                    using (SqlCommand cmd = new SqlCommand(getBookSql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@rid", req.RecordId);
+                        object result = cmd.ExecuteScalar();
+                        if (result != null) bookId = (int)result;
+                        else return BadRequest(new { success = false, message = "Không tìm thấy dữ liệu mượn." });
+                    }
+
+                    // BƯỚC 2: Thực hiện trả sách (Update Status = Returned)
+                    // Lưu ý: Trigger SQL sẽ tự động chạy ở bước này để +1 Tồn kho
+                    string returnSql = @"UPDATE BorrowRecords 
+                                 SET status = 'Returned', return_date = GETDATE() 
+                                 WHERE record_id = @rid AND user_id = @uid AND (status = 'Borrowing' OR status = 'Overdue')";
+
+                    using (SqlCommand cmd = new SqlCommand(returnSql, conn))
                     {
                         cmd.Parameters.AddWithValue("@rid", req.RecordId);
                         cmd.Parameters.AddWithValue("@uid", req.UserId);
                         int rows = cmd.ExecuteNonQuery();
 
-                        if (rows > 0) return Ok(new { success = true, message = "Trả sách thành công!" });
-                        else return BadRequest(new { success = false, message = "Lỗi: Không tìm thấy lượt mượn hoặc sách đã trả." });
+                        if (rows == 0) return BadRequest(new { success = false, message = "Lỗi: Không thể trả sách (Sách đã trả hoặc không tồn tại)." });
                     }
+                    // BƯỚC 3 (LOGIC MỚI): KIỂM TRA VÀ TỰ ĐỘNG CHUYỂN SÁCH CHO NGƯỜI ĐẶT TRƯỚC (NẾU CÓ)
+
+                    // Tìm người đặt trước sớm nhất (Reserved) cho cuốn sách này
+                    string findReservationSql = @"SELECT TOP 1 record_id, user_id 
+                                          FROM BorrowRecords 
+                                          WHERE book_id = @bid AND status = 'Reserved' 
+                                          ORDER BY borrow_date ASC"; // Ưu tiên người đặt trước
+
+                    int reservedRecordId = 0;
+                    using (SqlCommand cmd = new SqlCommand(findReservationSql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@bid", bookId);
+                        object res = cmd.ExecuteScalar();
+                        if (res != null) reservedRecordId = (int)res;
+                    }
+
+                    // Nếu có người đang chờ
+                    if (reservedRecordId > 0)
+                    {
+                        // 3.1. Chuyển trạng thái người đó sang 'Ready' (Sẵn sàng lấy)
+                        // Gán hạn lấy sách là 2 ngày tới (tùy chỉnh)
+                        string updateReadySql = "UPDATE BorrowRecords SET status = 'Ready', due_date = DATEADD(day, 2, GETDATE()) WHERE record_id = @recId";
+                        using (SqlCommand cmd = new SqlCommand(updateReadySql, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@recId", reservedRecordId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // 3.2. TRỪ KHO ĐI 1 (Giữ sách)
+                        // Vì Trigger ở Bước 2 đã +1 kho, nên giờ ta phải -1 để kho về 0.
+                        // Điều này đảm bảo sách không hiện "Có sẵn" ngoài trang chủ, tránh người khác vào mượn mất.
+                        string holdStockSql = "UPDATE Books SET stock_quantity = stock_quantity - 1 WHERE book_id = @bid";
+                        using (SqlCommand cmd = new SqlCommand(holdStockSql, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@bid", bookId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // Cập nhật lại trạng thái hiển thị là "Hết hàng" (nếu kho về 0) để đồng bộ
+                        string updateStatusSql = "UPDATE Books SET current_status = N'Hết hàng' WHERE book_id = @bid AND stock_quantity <= 0";
+                        using (SqlCommand cmd = new SqlCommand(updateStatusSql, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@bid", bookId);
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+
+                    return Ok(new { success = true, message = "Trả sách thành công!" });
                 }
             }
             catch (Exception ex) { return StatusCode(500, new { message = ex.Message }); }

@@ -1,4 +1,4 @@
-package com.example.bookhub; // Hoặc com.example.bookhub.activity
+package com.example.bookhub;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -21,6 +21,7 @@ import com.example.bookhub.api.RetrofitClient;
 import com.example.bookhub.models.ActionRequest;
 import com.example.bookhub.models.ActionResponse;
 import com.example.bookhub.models.BorrowRecord;
+import com.example.bookhub.models.BorrowRequest;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ReservationsFragment extends Fragment { // Tên class có thể là ReservationFragment (số ít) tùy bạn tạo
+public class ReservationsFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private ReservationAdapter adapter;
@@ -39,7 +40,6 @@ public class ReservationsFragment extends Fragment { // Tên class có thể là
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Layout: fragment_reservation hoặc fragment_reservations
         return inflater.inflate(R.layout.fragment_reservation, container, false);
     }
 
@@ -47,17 +47,21 @@ public class ReservationsFragment extends Fragment { // Tên class có thể là
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // ID: recycler_reservation
+        // Ánh xạ RecyclerView
         recyclerView = view.findViewById(R.id.recycler_reservation);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapter = new ReservationAdapter(getContext(), list, this);
         recyclerView.setAdapter(adapter);
 
+        // Tải dữ liệu lần đầu
         loadData();
     }
 
+    // Hàm gọi API lấy danh sách đặt trước
     public void loadData() {
+        if (getContext() == null) return;
+
         SharedPreferences prefs = requireContext().getSharedPreferences("BookHubPrefs", Context.MODE_PRIVATE);
         int userId = prefs.getInt("CURRENT_USER_ID", -1);
 
@@ -70,13 +74,18 @@ public class ReservationsFragment extends Fragment { // Tên class có thể là
                     list.clear();
                     list.addAll(response.body());
                     adapter.notifyDataSetChanged();
+
+                    // Nếu danh sách trống, có thể hiện thông báo (tùy chỉnh thêm)
                 }
             }
-            @Override public void onFailure(Call<List<BorrowRecord>> call, Throwable t) {}
+            @Override
+            public void onFailure(Call<List<BorrowRecord>> call, Throwable t) {
+                Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
-    // --- ADAPTER ---
+    // --- ADAPTER XỬ LÝ DANH SÁCH ---
     public static class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.ViewHolder> {
         private Context context;
         private List<BorrowRecord> list;
@@ -91,7 +100,8 @@ public class ReservationsFragment extends Fragment { // Tên class có thể là
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_reservation_book, parent, false));
+            View view = LayoutInflater.from(context).inflate(R.layout.item_reservation_book, parent, false);
+            return new ViewHolder(view);
         }
 
         @Override
@@ -101,11 +111,14 @@ public class ReservationsFragment extends Fragment { // Tên class có thể là
             holder.tvDate.setText("Ngày đặt: " + record.getBorrowDate());
             holder.tvStatus.setText(record.getDisplayStatus());
 
+            // Tô màu trạng thái
             try {
                 holder.tvStatus.setBackgroundColor(Color.parseColor(record.getStatusColor()));
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                holder.tvStatus.setBackgroundColor(Color.GRAY);
+            }
 
-            // Nút HỦY ĐẶT
+            // 1. XỬ LÝ NÚT HỦY ĐẶT
             holder.btnCancel.setOnClickListener(v -> {
                 new AlertDialog.Builder(context)
                         .setTitle("Hủy đặt trước")
@@ -115,15 +128,55 @@ public class ReservationsFragment extends Fragment { // Tên class có thể là
                         .show();
             });
 
-            // Nút MƯỢN NGAY (Chỉ hiện khi sách Sẵn sàng)
+            // 2. XỬ LÝ NÚT MƯỢN NGAY
+            // Chỉ hiện nút khi trạng thái là "Sẵn sàng"
             if ("Sẵn sàng".equals(record.getDisplayStatus())) {
                 holder.btnBorrow.setVisibility(View.VISIBLE);
-                holder.btnBorrow.setOnClickListener(v -> Toast.makeText(context, "Vui lòng đến thư viện nhận sách", Toast.LENGTH_LONG).show());
+
+                holder.btnBorrow.setOnClickListener(v -> {
+                    // Gọi hàm xác nhận mượn
+                    confirmBorrow(record.getBookId());
+                });
             } else {
                 holder.btnBorrow.setVisibility(View.GONE);
             }
         }
 
+        // HÀM GỌI API MƯỢN SÁCH (CHUYỂN TỪ READY -> BORROWING)
+        private void confirmBorrow(int bookId) {
+            SharedPreferences prefs = context.getSharedPreferences("BookHubPrefs", Context.MODE_PRIVATE);
+            int userId = prefs.getInt("CURRENT_USER_ID", -1);
+
+            if (userId == -1) return;
+
+            // Tạo request
+            BorrowRequest request = new BorrowRequest(userId, bookId);
+
+            // Gọi API
+            RetrofitClient.getApiService().borrowBook(request).enqueue(new Callback<ActionResponse>() {
+                @Override
+                public void onResponse(Call<ActionResponse> call, Response<ActionResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        if (response.body().isSuccess()) {
+                            Toast.makeText(context, "Mượn thành công! Vui lòng kiểm tra tab Đang mượn.", Toast.LENGTH_LONG).show();
+                            // Load lại danh sách để xóa cuốn sách vừa mượn khỏi tab này
+                            fragment.loadData();
+                        } else {
+                            Toast.makeText(context, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(context, "Lỗi server: " + response.code(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ActionResponse> call, Throwable t) {
+                    Toast.makeText(context, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        //  HÀM HỦY ĐẶT
         private void cancelReservation(int recordId) {
             SharedPreferences prefs = context.getSharedPreferences("BookHubPrefs", Context.MODE_PRIVATE);
             int userId = prefs.getInt("CURRENT_USER_ID", -1);
@@ -134,15 +187,20 @@ public class ReservationsFragment extends Fragment { // Tên class có thể là
                 public void onResponse(Call<ActionResponse> call, Response<ActionResponse> response) {
                     if (response.isSuccessful()) {
                         Toast.makeText(context, "Đã hủy đặt trước", Toast.LENGTH_SHORT).show();
-                        fragment.loadData();
+                        fragment.loadData(); // Load lại danh sách
                     }
                 }
-                @Override public void onFailure(Call<ActionResponse> call, Throwable t) {}
+                @Override
+                public void onFailure(Call<ActionResponse> call, Throwable t) {
+                    Toast.makeText(context, "Lỗi kết nối", Toast.LENGTH_SHORT).show();
+                }
             });
         }
 
         @Override
-        public int getItemCount() { return list.size(); }
+        public int getItemCount() {
+            return list.size();
+        }
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
             TextView tvTitle, tvDate, tvStatus;

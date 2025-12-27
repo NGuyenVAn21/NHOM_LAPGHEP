@@ -7,10 +7,7 @@ public class Event {
     private String startDate;
     private String endDate;
     private String imageUrl;
-
-    // --- BẠN CẦN THÊM DÒNG NÀY ---
     public int getId() { return id; }
-    // -----------------------------
 
     public String getTitle() { return title; }
     public String getDescription() { return description; }
